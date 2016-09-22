@@ -385,36 +385,15 @@ sub startup {
                 my $mobilephone = $self->param('contact.mobilephone');
                 my $cvr = $self->param('contact.cvr');
                 my $pnumber = $self->param('contact.pnumber');
-                if($email2 || $mobilephone || $cvr || $pnumber) {
+                my $attention = $self->param('contact.attention');
+                if($email2 || $mobilephone || $cvr || $pnumber || $attention) {
                     my $extension = $frame->createElement('extension');
 
-                    if($email2) {
-                        my $email2_element = $frame->createElement('dkhm:secondaryEmail');
-                        $email2_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.5', 'dkhm');
-                        $email2_element->appendText($email2);
-                        $extension->appendChild($email2_element);
-                    }
-
-                    if($mobilephone) {
-                        my $mobilephone_element = $frame->createElement('dkhm:mobilephone');
-                        $mobilephone_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.5', 'dkhm');
-                        $mobilephone_element->appendText($mobilephone);
-                        $extension->appendChild($mobilephone_element);
-                    }
-
-                    if($cvr) {
-                        my $cvr_element = $frame->createElement('dkhm:CVR');
-                        $cvr_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.5', 'dkhm');
-                        $cvr_element->appendText($cvr);
-                        $extension->appendChild($cvr_element);
-                    }
-
-                    if($pnumber) {
-                        my $pnumber_element = $frame->createElement('dkhm:pnumber');
-                        $pnumber_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.5', 'dkhm');
-                        $pnumber_element->appendText($pnumber);
-                        $extension->appendChild($pnumber_element);
-                    }
+                    _add_extension_element($frame, 'dkhm:attention', $attention, $extension);
+                    _add_extension_element($frame, 'dkhm:pnumber', $pnumber, $extension);
+                    _add_extension_element($frame, 'dkhm:CVR', $cvr, $extension);
+                    _add_extension_element($frame, 'dkhm:mobilephone', $mobilephone, $extension);
+                    _add_extension_element($frame, 'dkhm:secondaryEmail', $email2, $extension);
 
                     $frame->getNode('command')->appendChild($extension);
                 }
@@ -436,6 +415,7 @@ sub startup {
                 'contact.usertype'    => $self->param('contact.usertype'),
                 'contact.cvr'         => $self->param('contact.cvr'),
                 'contact.pnumber'     => $self->param('contact.pnumber'),
+                'contact.attention'   => $self->param('contact.attention'),
             );
         }
 
@@ -822,6 +802,17 @@ sub _text_element_into {
 
         $number ||= 1;
         $number++;
+    }
+}
+
+sub _add_extension_element {
+    my($xml_frame, $element_name, $value, $extension_element) = @_;
+
+    if($value) {
+        my $element = $xml_frame->createElement($element_name);
+        $element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.5', 'dkhm');
+        $element->appendText($value);
+        $extension_element->appendChild($element);
     }
 }
 
