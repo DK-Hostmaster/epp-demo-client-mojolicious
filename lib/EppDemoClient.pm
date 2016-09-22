@@ -383,7 +383,9 @@ sub startup {
 
                 my $email2 = $self->param('contact.email2');
                 my $mobilephone = $self->param('contact.mobilephone');
-                if($email2 || $mobilephone) {
+                my $cvr = $self->param('contact.cvr');
+                my $pnumber = $self->param('contact.pnumber');
+                if($email2 || $mobilephone || $cvr || $pnumber) {
                     my $extension = $frame->createElement('extension');
 
                     if($email2) {
@@ -398,6 +400,20 @@ sub startup {
                         $mobilephone_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.5', 'dkhm');
                         $mobilephone_element->appendText($mobilephone);
                         $extension->appendChild($mobilephone_element);
+                    }
+
+                    if($cvr) {
+                        my $cvr_element = $frame->createElement('dkhm:CVR');
+                        $cvr_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.5', 'dkhm');
+                        $cvr_element->appendText($cvr);
+                        $extension->appendChild($cvr_element);
+                    }
+
+                    if($pnumber) {
+                        my $pnumber_element = $frame->createElement('dkhm:pnumber');
+                        $pnumber_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.5', 'dkhm');
+                        $pnumber_element->appendText($pnumber);
+                        $extension->appendChild($pnumber_element);
                     }
 
                     $frame->getNode('command')->appendChild($extension);
