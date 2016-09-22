@@ -1,0 +1,6 @@
+<div class="form-group">
+    <label for="inputHost" class="col-sm-3 control-label">Hostname</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" id="inputHost" placeholder="Hostname" value="<%= session 'host' %>" name="host">
+    </div>
+</div>

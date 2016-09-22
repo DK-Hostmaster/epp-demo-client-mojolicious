@@ -1,0 +1,64 @@
+<%= include 'includes/input_domain' %>
+
+<div class="form-group">
+    <label for="inputPeriod" class="col-sm-3 control-label">Period</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" id="inputPeriod" value="<%= session 'period' %>" name="period">
+        <p class="help-block">1,2,3 or 5.</p>
+    </div>
+</div>
+
+<div id="new_nameservers">
+    <div class="form-group form-inline new_nameserver">
+        <label class="col-sm-3 control-label">Nameserver</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="Nameserver name" name="new_nameserver_name">
+            <button class="btn btn-primary" onclick="return add_addr_field('new_nameserver', 'new_nameservers');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Registrant</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" placeholder="User id" name="new_registrant" value="<%= session 'new_registrant' %>">
+    </div>
+</div>
+
+<div id="new_contacts">
+    <div class="form-group form-inline new_contact">
+        <label class="col-sm-3 control-label">Contact</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="Contact type" name="new_contact_type">
+            <input type="text" class="form-control" placeholder="Contact id" name="new_contact_userid">
+            <button class="btn btn-primary" onclick="return add_addr_field('new_contact', 'new_contacts');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Authinfo</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" placeholder="Password" name="authinfo_pw" value="<%= session('authinfo_pw') || 'dummy' %>">
+    </div>
+</div>
+
+<div id="new_dss">
+    <div class="form-group form-inline new_ds">
+        <label class="col-sm-3 control-label">DS</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="Keytag" name="new_ds_keytag">
+            <input type="text" class="form-control" placeholder="Algorithm" name="new_ds_algorithm">
+            <input type="text" class="form-control" placeholder="Digest type" name="new_ds_digest_type">
+            <input type="text" class="form-control" placeholder="Digest" name="new_ds_digest">
+            <button class="btn btn-primary" onclick="return add_addr_field('new_ds', 'new_dss');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Order Confirmation Token</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" placeholder="Order confirmation token" name="orderconfirmationtoken" value="<%= session('orderconfirmationtoken') %>">
+    </div>
+</div>

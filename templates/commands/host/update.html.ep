@@ -1,0 +1,35 @@
+<%= include 'includes/input_host' %>
+
+<div class="form-group">
+    <label for="inputNewHost" class="col-sm-3 control-label">New hostname</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" id="inputNewHost" placeholder="New hostname" value="<%= session 'new_host' %>" name="new_host">
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">New NSA</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" placeholder="DKHM1-DK" name="requestedNsAdmin" value="<%= session 'requestedNsAdmin' %>">
+    </div>
+</div>
+
+<div id="add_ips">
+    <div class="form-group form-inline add_ip_addr">
+        <label class="col-sm-3 control-label">Add IP-address</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="192.168.101.1" name="add_addr">
+            <button class="btn btn-primary" onclick="return add_addr_field('add_ip_addr', 'add_ips');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div id="remove_ips">
+    <div class="form-group form-inline rem_ip_addr">
+        <label class="col-sm-3 control-label">Remove IP-address</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="192.168.101.1" name="remove_addr">
+            <button class="btn btn-primary" onclick="return add_addr_field('rem_ip_addr', 'remove_ips');">Add</button>
+        </div>
+    </div>
+</div>

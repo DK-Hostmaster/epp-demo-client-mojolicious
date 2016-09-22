@@ -1,0 +1,20 @@
+<%= include 'includes/input_host' %>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">NSA</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" placeholder="DKHM1-DK" name="requestedNsAdmin" value="<%= session 'requestedNsAdmin' %>">
+    </div>
+</div>
+
+<div id="ips">
+
+    <div class="form-group form-inline ip_addr">
+        <label class="col-sm-3 control-label">IP-address</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="192.168.101.1" name="addr">
+            <button class="btn btn-primary" onclick="return add_addr_field('ip_addr', 'ips');">Add</button>
+        </div>
+    </div>
+
+</div>

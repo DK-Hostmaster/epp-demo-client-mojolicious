@@ -1,0 +1,7 @@
+% my $values = session 'values';
+% my $selected = stash 'selected';
+<select onchange="get_command_form(this.value);" name="<%= $name %>" class="form-control" <%= $values && scalar @{$values} > 0 ? '' : 'disabled="disabled"' %>>
+% foreach my $value (@{$values}) {
+    <option <%= $value eq $selected ? 'selected="selected"' : '' %> value="<%= $value %>"><%= $value %></option>
+% }
+</select>

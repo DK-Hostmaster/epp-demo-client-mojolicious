@@ -1,0 +1,6 @@
+<div class="form-group">
+    <label for="inputContact" class="col-sm-3 control-label">Contact id</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" id="inputContact" placeholder="Contact id" value="<%= session 'userid' %>" name="userid">
+    </div>
+</div>

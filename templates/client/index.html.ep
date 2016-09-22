@@ -1,0 +1,237 @@
+% layout 'default';
+
+% my $logged_in = stash 'logged_in';
+
+<button class="btn btn-primary" type="button">
+% if ($logged_in) {
+  Logged in <span class="badge" style="color: green;"><i class="fa fa-user" aria-hidden="true"></i> </span>
+% } else {
+  NOT logged in <span class="badge" style="color: red;"><i class="fa fa-user-times" aria-hidden="true"></i></span>
+% }
+</button>
+
+% if ($logged_in) {
+<a href="logout"><button class="btn btn-warning" type="button">Logout</button></a>
+% }
+
+% my $hello_reply = stash 'hello_reply';
+% my $command_reply = stash 'command_reply';
+% if ($command_reply) {
+<div class="row" style="padding-top: 20px;">
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#command_reply_form" aria-controls="command_reply_form" role="tab" data-toggle="tab">Response</a></li>
+        <li role="presentation"><a href="#command_reply_xml" aria-controls="command_reply_xml" role="tab" data-toggle="tab">Response XML</a></li>
+        % if($hello_reply) {
+            <li role="presentation"><a href="#hello_reply_xml" aria-controls="hello_reply_xml" role="tab" data-toggle="tab">Hello Response XML</a></li>
+        % }
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="command_reply_form">
+
+            <div class="col-sm-6">
+
+                <div class="form-group row" style="padding-top: 20px;">
+                    <label class="col-sm-3 control-label">execution time</label>
+                    <div class="col-sm-9">
+                        <%= stash 'execute_time' %>
+                    </div>
+                </div>
+
+
+                <div class="form-group row">
+                    <label class="col-sm-3 control-label">code</label>
+                    <div class="col-sm-9">
+
+                        <% if($command_reply->{code} == 1000 || $command_reply->{code} == 1500 || $command_reply->{code} == 1001 || $command_reply->{code} == 1301 || $command_reply->{code} == 1300) { %>
+                        <span class="label label-success"><%= $command_reply->{code} %></span>
+                        <% } else { %>
+                        <span class="label label-danger"><%= $command_reply->{code} %></span>
+                        <% } %>
+
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-3 control-label">message</label>
+                    <div class="col-sm-9">
+                        <%= $command_reply->{msg} %>
+                    </div>
+                </div>
+
+                % foreach my $key (sort keys %{$command_reply}) {
+                %    next if $key =~ m/(msg|code|xml)/;
+                <div class="form-group row">
+                    <label class="col-sm-3 control-label"><%= $key %></label>
+                    <div class="col-sm-9">
+                        % my $val = $command_reply->{$key};
+                        % if ( ref($val) eq "HASH" ) {
+                            % foreach my $key2 (sort keys %{$val}) {
+                            % my($val2) = $val->{$key2};
+                            <div class="form-group row">
+                                <label class="col-sm-3 control-label"><%= $key2 %></label>
+                                <div class="col-sm-9">
+                                    <%= $val2 %>
+                                </div>
+                            </div>
+                            % }
+                        % } else {
+                            <%= $val %>
+                        % }
+                    </div>
+                </div>
+                % }
+
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="command_reply_xml">
+            <pre><code class="language-xml"><%= $command_reply->{xml} %></code></pre>
+        </div>
+        % if($hello_reply) {
+            <div role="tabpanel" class="tab-pane" id="hello_reply_xml">
+                <pre><code class="language-xml"><%= $hello_reply %></code></pre>
+            </div>
+        % }
+    </div>
+</div>
+% }
+
+% if (!$logged_in) {
+<div class="row" style="padding-top: 20px;">
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#login_form" aria-controls="login_form" role="tab" data-toggle="tab">Request Form</a></li>
+        <li role="presentation"><a href="#login_xml" aria-controls="login_xml" role="tab" data-toggle="tab">Request XML</a></li>
+    </ul>
+
+    %= form_for 'login', method=>'POST', class=>'form-horizontal', style=>'padding-top: 20px;', begin
+
+    <div class="row">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="login_form">
+
+                <div class="col-sm-6">
+                    % my $host = session 'hostname';
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">EPP server</label>
+                        <div class="col-sm-9">
+                            <select name="hostname" class="form-control">
+                                <option <%= $host eq 'clb2002.dk-hostmaster.dk' ? 'selected="selected"' : '' %> value="clb2002.dk-hostmaster.dk">clb2002.dk-hostmaster.dk</option>
+                                <option <%= $host eq 'epp-lb1.sand.dkhm.dk' ? 'selected="selected"' : '' %> value="epp-lb1.sand.dkhm.dk">epp-lb1.sand.dkhm.dk</option>
+                                <option <%= $host eq 'epp-evaluation.dk-hostmaster.dk' ? 'selected="selected"' : '' %> value="epp-evaluation.dk-hostmaster.dk">epp-evaluation.dk-hostmaster.dk</option>
+                                <option <%= $host eq 'epp-sandbox.dk-hostmaster.dk' ? 'selected="selected"' : '' %> value="epp-sandbox.dk-hostmaster.dk">epp-sandbox.dk-hostmaster.dk</option>
+                                <option <%= $host eq 'epp1.dev.dkhm.dk' ? 'selected="selected"' : '' %> value="epp1.dev.dkhm.dk">epp1.dev.dkhm.dk</option>
+                                <option <%= $host eq 'localhost' ? 'selected="selected"' : '' %> value="localhost">localhost</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">EPP port</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="inputPort" value="700" name="port">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Username</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="inputUsername" placeholder="Username" name="username" value="<%= session 'username'%>">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputPassword" class="col-sm-3 control-label">Password</label>
+                        <div class="col-sm-4">
+                            <input type="password" class="form-control" id="inputPassword" placeholder="Password" name="password" value="<%= session 'password'%>">
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <div role="tabpanel" class="tab-pane" id="login_xml">
+                <div class="col-sm-12">
+                    <pre><code class="language-xml" id="login_xml_code"></code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <button type="submit" class="btn btn-default">Send</button>
+        </div>
+    </div>
+    %= end
+
+</div>
+
+% }
+
+% if ($logged_in) {
+    <div class="page-header">
+      <h1>Send command</h1>
+    </div>
+
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#request_form" aria-controls="request_form" role="tab" data-toggle="tab">Request Form</a></li>
+        <li role="presentation"><a href="#request_xml" aria-controls="request_xml" role="tab" data-toggle="tab">Request XML</a></li>
+    </ul>
+
+    %= form_for 'execute', method=>'POST', class=>'form-horizontal', style=>'padding-top: 20px;', id => 'execute_form', begin
+    <div class="row">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="request_form">
+
+                % my $object = session 'object';
+                % my $command = session 'command';
+
+                <div class="row">
+                    <div class="col-lg-6" id="form_groups">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Object</label>
+                            <div class="col-sm-9">
+                                <select name="object" class="form-control" id="object_select" onchange="get_commands_from_object(this.value);">
+                                    <option>-- Choose --</option>
+                                    <option <%= $object eq 'contact' ? 'selected="selected"' : '' %> value="contact">Contact</option>
+                                    <option <%= $object eq 'domain' ? 'selected="selected"' : '' %> value="domain">Domain</option>
+                                    <option <%= $object eq 'host' ? 'selected="selected"' : '' %> value="host">Host</option>
+                                    <option <%= $object eq 'poll' ? 'selected="selected"' : '' %> value="poll">Messages</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Command</label>
+                            <div class="col-sm-9" id="command_select">
+                                %= include 'includes/select', name => 'command', selected => $command
+                            </div>
+                        </div>
+
+                        <div id="command_form">
+                            % if ($object and $command) {
+                            <%= include "commands/$object/$command" %>
+                            % }
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <div role="tabpanel" class="tab-pane" id="request_xml">
+                <div class="col-sm-12">
+                    <pre><code class="language-xml" id="request_xml_code"></code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <button type="submit" class="btn btn-default">Send</button>
+        </div>
+    </div>
+
+    % end
+
+% }

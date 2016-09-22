@@ -1,0 +1,6 @@
+<div class="form-group">
+    <label for="inputDomain" class="col-sm-3 control-label">Domain name</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" id="inputDomain" value="<%= session 'domain' %>" name="domain">
+    </div>
+</div>
