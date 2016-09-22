@@ -61,94 +61,26 @@
                 </div>
 
                 % foreach my $key (sort keys %{$command_reply}) {
-                % unless($key =~ m/(msg|code|xml|msgQ|domain_data|host_data|contact_data)/) {
+                %    next if $key =~ m/(msg|code|xml)/;
                 <div class="form-group row">
                     <label class="col-sm-3 control-label"><%= $key %></label>
                     <div class="col-sm-9">
-                        <%= $command_reply->{$key} %>
+                        % my $val = $command_reply->{$key};
+                        % if ( ref($val) eq "HASH" ) {
+                            % foreach my $key2 (sort keys %{$val}) {
+                            % my($val2) = $val->{$key2};
+                            <div class="form-group row">
+                                <label class="col-sm-3 control-label"><%= $key2 %></label>
+                                <div class="col-sm-9">
+                                    <%= $val2 %>
+                                </div>
+                            </div>
+                            % }
+                        % } else {
+                            <%= $val %>
+                        % }
                     </div>
                 </div>
-                % }
-                % }
-
-                % if($command_reply->{domain_data}) {
-
-                    <div class="form-group row">
-                        <label class="col-sm-3 control-label">domain data</label>
-                        <div class="col-sm-9">
-
-                            % foreach my $key (sort keys %{$command_reply->{domain_data}}) {
-                            <div class="form-group row">
-                                <label class="col-sm-3 control-label"><%= $key %></label>
-                                <div class="col-sm-9">
-                                    <%= $command_reply->{domain_data}->{$key} %>
-                                </div>
-                            </div>
-                            % }
-
-                        </div>
-                    </div>
-
-                % }
-
-                % if($command_reply->{host_data}) {
-
-                    <div class="form-group row">
-                        <label class="col-sm-3 control-label">host data</label>
-                        <div class="col-sm-9">
-
-                            % foreach my $key (sort keys %{$command_reply->{host_data}}) {
-                            <div class="form-group row">
-                                <label class="col-sm-3 control-label"><%= $key %></label>
-                                <div class="col-sm-9">
-                                    <%= $command_reply->{host_data}->{$key} %>
-                                </div>
-                            </div>
-                            % }
-
-                        </div>
-                    </div>
-
-                % }
-
-                % if($command_reply->{contact_data}) {
-
-                    <div class="form-group row">
-                        <label class="col-sm-3 control-label">contact data</label>
-                        <div class="col-sm-9">
-
-                            % foreach my $key (sort keys %{$command_reply->{contact}}) {
-                            <div class="form-group row">
-                                <label class="col-sm-3 control-label"><%= $key %></label>
-                                <div class="col-sm-9">
-                                    <%= $command_reply->{contact}->{$key} %>
-                                </div>
-                            </div>
-                            % }
-
-                        </div>
-                    </div>
-
-                % }
-
-                % if($command_reply->{msgQ}) {
-
-                    <div class="form-group row">
-                        <label class="col-sm-3 control-label">msgQ</label>
-                        <div class="col-sm-9">
-
-                            % foreach my $key (sort keys %{$command_reply->{msgQ}}) {
-                            <div class="form-group row">
-                                <label class="col-sm-3 control-label"><%= $key %></label>
-                                <div class="col-sm-9">
-                                    <%= $command_reply->{msgQ}->{$key} %>
-                                </div>
-                            </div>
-                            % }
-
-                        </div>
-                    </div>
-
                 % }
 
             </div>

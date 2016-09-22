@@ -610,91 +610,99 @@ sub startup {
 
         my $host_element = ($epp_frame->getElementsByTagName('host:infData'));
         if($host_element) {
-            my $inf = { };
+            my $info = ( $reply->{host_data} //= {} );
 
-            _text_element_into( $epp_frame, 'host:name',   $inf, 'name'   );
-            _text_element_into( $epp_frame, 'host:roid',   $inf, 'roid' );
+            _text_element_into( $epp_frame, 'host:name',   $info, 'name'   );
+            _text_element_into( $epp_frame, 'host:roid',   $info, 'roid' );
 
             my $status = "status";
             foreach my $ele ( _elements( $epp_frame, 'host:status' ) ) {
                 my $s = $ele->{"s"};
-                $inf->{ $status } = $s;
-                $status .= " ";
+                $info->{ $status } = $s;
+                $status .= " ";  # A new key, but space is not visible
             }
 
             my $addr = "addr";
             foreach my $ele ( _elements( $epp_frame, 'host:addr' ) ) {
-                $inf->{ $addr } = $ele->textContent . " (". $ele->{"ip"} . ")";
-                $addr .= " ";
+                $info->{ $addr } = $ele->textContent . " (". $ele->{"ip"} . ")";
+                $addr .= " ";  # A new key, but space is not visible
             }
 
-            _text_element_into( $epp_frame, 'host:clID',       $inf, 'clID' );
-            _text_element_into( $epp_frame, 'host:crID',       $inf, 'crID' );
-            _text_element_into( $epp_frame, 'host:crDate',     $inf, 'crDate' );
+            _text_element_into( $epp_frame, 'host:clID',     $info, 'clID' );
+            _text_element_into( $epp_frame, 'host:crID',     $info, 'crID' );
+            _text_element_into( $epp_frame, 'host:crDate',   $info, 'crDate' );
 
-
-            $reply->{host_data} = $inf;
         }
 
         my($domain_element) = _elements( $epp_frame, 'domain:infData');
         if($domain_element) {
-            my $inf = { };
+            my $info = ( $reply->{domain_data} //= {} );
 
-            _text_element_into( $epp_frame, 'domain:name',   $inf, 'name'   );
-            _text_element_into( $epp_frame, 'domain:roid',   $inf, 'roid' );
+            _text_element_into( $epp_frame, 'domain:name',   $info, 'name'   );
+            _text_element_into( $epp_frame, 'domain:roid',   $info, 'roid' );
 
             #  <domain:status s="serverDeleteProhibited"/>
             my $status = "status";
             foreach my $ele ( _elements( $epp_frame, 'domain:status' ) ) {
                 my $s = $ele->{"s"};
-                $inf->{ $status } = $s;
-                $status .= " ";
+                $info->{ $status } = $s;
+                $status .= " "; # A new key, but space is not visible
             }
 
-            _text_element_into( $epp_frame, 'domain:registrant', $inf, 'registrant' );
+            _text_element_into( $epp_frame, 'domain:registrant', $info, 'registrant' );
 
             foreach my $ele ( _elements( $epp_frame, 'domain:contact' ) ) {
-                $inf->{ $ele->{"-type"} } = $ele->{"#text"};
+                $info->{ $ele->{"-type"} } = $ele->{"#text"};
             }
 
-            _text_element_into( $epp_frame, 'domain:hostObj',    $inf, 'ns' );
-            _text_element_into( $epp_frame, 'domain:host',       $inf, 'host' );
-            _text_element_into( $epp_frame, 'domain:clID',       $inf, 'clID' );
-            _text_element_into( $epp_frame, 'domain:crID',       $inf, 'crID' );
-            _text_element_into( $epp_frame, 'domain:crDate',     $inf, 'crDate' );
-            _text_element_into( $epp_frame, 'domain:exDate',     $inf, 'exDate' );
+            _text_element_into( $epp_frame, 'domain:hostObj',    $info, 'ns' );
+            _text_element_into( $epp_frame, 'domain:host',       $info, 'host' );
+            _text_element_into( $epp_frame, 'domain:clID',       $info, 'clID' );
+            _text_element_into( $epp_frame, 'domain:crID',       $info, 'crID' );
+            _text_element_into( $epp_frame, 'domain:crDate',     $info, 'crDate' );
+            _text_element_into( $epp_frame, 'domain:exDate',     $info, 'exDate' );
 
-            $reply->{domain_data} = $inf;
         }
 
         my($contact_element) = _elements( $epp_frame, 'contact:infData');
         if($contact_element) {
-            my $contact = ( $reply->{contact_data} //= {} );
-            _text_element_into( $epp_frame, 'contact:id',     $contact, 'id'   );
-            _text_element_into( $epp_frame, 'contact:roid',   $contact, 'roid' );
-            _text_element_into( $epp_frame, 'contact:name',   $contact, 'name' );
-            _text_element_into( $epp_frame, 'contact:street', $contact, 'street' );
-            _text_element_into( $epp_frame, 'contact:city',   $contact, 'city' );
-            _text_element_into( $epp_frame, 'contact:pc',     $contact, 'pc' );
-            _text_element_into( $epp_frame, 'contact:cc',     $contact, 'cc' );
-            _text_element_into( $epp_frame, 'contact:voice',  $contact, 'voice' );
-            _text_element_into( $epp_frame, 'contact:fax',    $contact, 'fax' );
-            _text_element_into( $epp_frame, 'contact:email',  $contact, 'email' );
-            _text_element_into( $epp_frame, 'contact:crDate', $contact, 'crDate' );
+            my $info = ( $reply->{contact_data} //= {} );
 
-            _text_element_into( $epp_frame, 'dkhm:contact_validated', $contact, 'validated' );
+            _text_element_into( $epp_frame, 'contact:id',     $info, 'id'   );
+            _text_element_into( $epp_frame, 'contact:roid',   $info, 'roid' );
+            _text_element_into( $epp_frame, 'contact:name',   $info, 'name' );
+            _text_element_into( $epp_frame, 'contact:street', $info, 'street' );
+            _text_element_into( $epp_frame, 'contact:city',   $info, 'city' );
+            _text_element_into( $epp_frame, 'contact:pc',     $info, 'pc' );
+            _text_element_into( $epp_frame, 'contact:cc',     $info, 'cc' );
+            _text_element_into( $epp_frame, 'contact:voice',  $info, 'voice' );
+            _text_element_into( $epp_frame, 'contact:fax',    $info, 'fax' );
+            _text_element_into( $epp_frame, 'contact:email',  $info, 'email' );
+            _text_element_into( $epp_frame, 'contact:clID',   $info, 'clID' );
+            _text_element_into( $epp_frame, 'contact:crID',   $info, 'crID' );
+            _text_element_into( $epp_frame, 'contact:crDate', $info, 'crDate' );
+
+            #  <contact:status s="serverDeleteProhibited"/>
+            my $status = "status";
+            foreach my $ele ( _elements( $epp_frame, 'contact:status' ) ) {
+                my $s = $ele->{"s"};
+                $info->{ $status } = $s;
+                $status .= " ";
+            }
+
+            _text_element_into( $epp_frame, 'dkhm:contact_validated', $info, 'validated' );
 
             $self->session(
-                'contact.street'      => $contact->{street},
-                'contact.city'        => $contact->{city},
-                'contact.zipcode'     => $contact->{pc},
-                'contact.country'     => $contact->{cc},
-                'contact.name'        => $contact->{name},
+                'contact.street'      => $info->{street},
+                'contact.city'        => $info->{city},
+                'contact.zipcode'     => $info->{pc},
+                'contact.country'     => $info->{cc},
+                'contact.name'        => $info->{name},
                 #'contact.org'         => $self->param('contact.org'),
-                'contact.voice'       => $contact->{voice},
+                'contact.voice'       => $info->{voice},
                 #'contact.mobilephone' => $self->param('contact.mobilephone'),
-                'contact.fax'         => $contact->{fax},
-                #'contact.email'       => $contact->{email},
+                'contact.fax'         => $info->{fax},
+                #'contact.email'       => $info->{email},
                 #'contact.email2'      => $self->param('contact.email2'),
                 #'contact.usertype'    => $self->param('contact.usertype'),
                 #'contact.cvr'         => $self->param('contact.cvr'),
@@ -705,36 +713,35 @@ sub startup {
 
         my $contact_created_element = ($epp_frame->getElementsByTagName('contact:creData'))[0];
         if($contact_created_element) {
-            my $contact = ( $reply->{contact_data} //= {} );
-            _text_element_into( $epp_frame, 'contact:id',     $contact, 'id' );
-            _text_element_into( $epp_frame, 'contact:crDate', $contact, 'crDate' );
+            my $info = ( $reply->{contact_data} //= {} );
+            _text_element_into( $epp_frame, 'contact:id',     $info, 'id' );
+            _text_element_into( $epp_frame, 'contact:crDate', $info, 'crDate' );
         }
 
         my $domain_created_element = ($epp_frame->getElementsByTagName('domain:creData'))[0];
         if($domain_created_element) {
-            my $domain = ( $reply->{domain_data} //= {} );
-            _text_element_into( $epp_frame, 'domain:name',   $domain, 'name' );
-            _text_element_into( $epp_frame, 'domain:crDate', $domain, 'crDate' );
-            _text_element_into( $epp_frame, 'domain:exDate', $domain, 'exDate' );
+            my $info = ( $reply->{domain_data} //= {} );
+            _text_element_into( $epp_frame, 'domain:name',   $info, 'name' );
+            _text_element_into( $epp_frame, 'domain:crDate', $info, 'crDate' );
+            _text_element_into( $epp_frame, 'domain:exDate', $info, 'exDate' );
         }
 
         my $host_created_element = ($epp_frame->getElementsByTagName('host:creData'))[0];
         if($host_created_element) {
-            my $host = ( $reply->{host_data} //= {} );
-            _text_element_into( $epp_frame, 'host:name',   $host, 'name' );
-            _text_element_into( $epp_frame, 'host:crDate', $host, 'crDate' );
+            my $info = ( $reply->{host_data} //= {} );
+            _text_element_into( $epp_frame, 'host:name',   $info, 'name' );
+            _text_element_into( $epp_frame, 'host:crDate', $info, 'crDate' );
         }
 
         my $msgq_element = ($epp_frame->getElementsByTagName('msgQ'))[0];
         if($msgq_element) {
-            my $msg = {};
-            $msg->{count} = $msgq_element->getAttribute("count");
-            $msg->{id} = $msgq_element->getAttribute("id");
+            my $info = ( $reply->{msgQ} //= {} );
+            $info->{count} = $msgq_element->getAttribute("count");
+            $info->{id}    = $msgq_element->getAttribute("id");
             my $message_element = ($msgq_element->getElementsByTagName('msg'))[0];
             if($message_element) {
-                $msg->{msg} = $message_element->textContent;
+                $info->{msg} = $message_element->textContent;
             }
-            $reply->{msgQ} = $msg;
         }
 
         return $reply;
