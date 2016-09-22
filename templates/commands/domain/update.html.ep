@@ -1,0 +1,100 @@
+<%= include 'includes/input_domain' %>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Change Registrant</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" placeholder="User id" name="change_registrant" value="<%= session 'change_registrant' %>">
+    </div>
+</div>
+
+<div id="rem_nameservers">
+    <div class="form-group form-inline rem_nameserver">
+        <label class="col-sm-3 control-label">Remove nameserver</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="Nameserver name" name="rem_nameserver_name">
+            <input type="text" class="form-control" placeholder="Nameserver addrs (optional, list)" name="rem_nameserver_addr">
+            <button class="btn btn-primary" onclick="return add_addr_field('rem_nameserver', 'rem_nameservers');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div id="add_nameservers">
+    <div class="form-group form-inline add_nameserver">
+        <label class="col-sm-3 control-label">Add nameserver</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="Nameserver name" name="add_nameserver_name">
+            <input type="text" class="form-control" placeholder="Nameserver addrs (optional, list)" name="add_nameserver_addr">
+            <button class="btn btn-primary" onclick="return add_addr_field('add_nameserver', 'add_nameservers');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div id="rem_statuss">
+    <div class="form-group form-inline rem_status">
+        <label class="col-sm-3 control-label">Remove Status</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="Status type" name="rem_status_type">
+            <input type="text" class="form-control" placeholder="Status info" name="rem_status_info">
+            <button class="btn btn-primary" onclick="return add_addr_field('rem_status', 'rem_statuss');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div id="add_statuss">
+    <div class="form-group form-inline add_status">
+        <label class="col-sm-3 control-label">Add Status</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="Status type" name="add_status_type">
+            <input type="text" class="form-control" placeholder="Status info" name="add_status_info">
+            <button class="btn btn-primary" onclick="return add_addr_field('add_status', 'add_statuss');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div id="rem_dss">
+    <div class="form-group form-inline rem_ds">
+        <label class="col-sm-3 control-label">Remove DS</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="Keytag" name="rem_ds_keytag">
+            <input type="text" class="form-control" placeholder="Algorithm" name="rem_ds_algorithm">
+            <input type="text" class="form-control" placeholder="Digest type" name="rem_ds_digest_type">
+            <input type="text" class="form-control" placeholder="Digest" name="rem_ds_digest">
+            <button class="btn btn-primary" onclick="return add_addr_field('rem_ds', 'rem_dss');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div id="add_dss">
+    <div class="form-group form-inline add_ds">
+        <label class="col-sm-3 control-label">Add DS</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="Keytag" name="add_ds_keytag">
+            <input type="text" class="form-control" placeholder="Algorithm" name="add_ds_algorithm">
+            <input type="text" class="form-control" placeholder="Digest type" name="add_ds_digest_type">
+            <input type="text" class="form-control" placeholder="Digest" name="add_ds_digest">
+            <button class="btn btn-primary" onclick="return add_addr_field('add_ds', 'add_dss');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div id="rem_contacts">
+    <div class="form-group form-inline rem_contact">
+        <label class="col-sm-3 control-label">Remove Contact</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="Contact type" name="rem_contact_type">
+            <input type="text" class="form-control" placeholder="Contact id" name="rem_contact_userid">
+            <button class="btn btn-primary" onclick="return add_addr_field('rem_contact', 'rem_contacts');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div id="add_contacts">
+    <div class="form-group form-inline add_contact">
+        <label class="col-sm-3 control-label">Add Contact</label>
+        <div class="col-sm-9">
+            <input type="text" class="form-control" placeholder="Contact type" name="add_contact_type">
+            <input type="text" class="form-control" placeholder="Contact id" name="add_contact_userid">
+            <button class="btn btn-primary" onclick="return add_addr_field('add_contact', 'add_contacts');">Add</button>
+        </div>
+    </div>
+</div>

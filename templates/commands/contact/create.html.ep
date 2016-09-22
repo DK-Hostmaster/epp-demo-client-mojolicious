@@ -1,0 +1,98 @@
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">User type*</label>
+    <div class="col-sm-9">
+        <select name="contact.usertype" class="form-control">
+            % my $usertype = session 'contact.usertype';
+            <option <%= $usertype eq 'company' ? 'selected="selected"' : '' %> value="company">company</option>
+            <option <%= $usertype eq 'public_organization' ? 'selected="selected"' : '' %> value="public_organization">public_organization</option>
+            <option <%= $usertype eq 'association' ? 'selected="selected"' : '' %> value="association">association</option>
+            <option <%= $usertype eq 'individual' ? 'selected="selected"' : '' %> value="individual">individual</option>
+            <option <%= $usertype eq 'C' ? 'selected="selected"' : '' %> value="C">C</option>
+            <option <%= $usertype eq 'P' ? 'selected="selected"' : '' %> value="P">P</option>
+            <option <%= $usertype eq 'A' ? 'selected="selected"' : '' %> value="A">A</option>
+            <option <%= $usertype eq 'I' ? 'selected="selected"' : '' %> value="I">I</option>
+        </select>
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Name*</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.name" value="<%= session 'contact.name' %>">
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Organisation</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.org" value="<%= session 'contact.org' %>">
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">CVR</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.cvr" value="<%= session 'contact.cvr' %>">
+        <p class="help-block">Required if user type is company (C)</p>
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Pnumber</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.pnumber" value="<%= session 'contact.pnumber' %>">
+    </div>
+</div>
+
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Street*</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.street" value="<%= session 'contact.street' %>">
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Zipcode*</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.zipcode" value="<%= session 'contact.zipcode' %>">
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">City*</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.city" value="<%= session 'contact.city' %>">
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Countrycode*</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.country" value="<%= session 'contact.country' %>">
+        <p class="help-block">Example: DK </p>
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Phonenumber*</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.voice" value="<%= session 'contact.voice' %>">
+         <p class="help-block">Example: +45.33646060</p>
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">Fax</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.fax" value="<%= session 'contact.fax' %>">
+        <p class="help-block">Example: +45.33646060</p>
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">E-mail*</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.email" value="<%= session 'contact.email' %>">
+    </div>
+</div>
