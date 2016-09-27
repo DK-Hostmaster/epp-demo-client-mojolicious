@@ -342,9 +342,16 @@ sub startup {
                 $frame->getNode('command')->appendChild($extension);
 
             } elsif ($command eq 'update') {
-                $frame->chgPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
 
-                if(!$self->param('contact.name')) {
+                if($self->param('contact.street')) {
+                    $frame->chgPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
+                } elsif ($self->param('contact.name')) {
+                    $frame->chgPostalInfo('loc', $self->param('contact.name'), undef, undef);
+                    my $addrnode = $frame->getNode('contact:addr');
+                    $frame->getNode('contact:postalInfo')->removeChild($addrnode);
+                }
+
+                if(!$self->param('contact.name') && $self->param('contact.street')) {
                     my $namenode = $frame->getNode('contact:name');
                     $frame->getNode('contact:postalInfo')->removeChild($namenode);
                 }
