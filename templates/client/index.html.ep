@@ -123,6 +123,7 @@
                                 <option <%= $host eq 'epp-sandbox.dk-hostmaster.dk' ? 'selected="selected"' : '' %> value="epp-sandbox.dk-hostmaster.dk">epp-sandbox.dk-hostmaster.dk</option>
                                 <option <%= $host eq 'epp1.dev.dkhm.dk' ? 'selected="selected"' : '' %> value="epp1.dev.dkhm.dk">epp1.dev.dkhm.dk</option>
                                 <option <%= $host eq 'localhost' ? 'selected="selected"' : '' %> value="localhost">localhost</option>
+                                <option <%= $host eq 'epp-test-sandbox.dk-hostmaster.dk' ? 'selected="selected"' : '' %> value="epp-test-sandbox.dk-hostmaster.dk">epp-test-sandbox.dk-hostmaster.dk</option>
                             </select>
                         </div>
                     </div>
