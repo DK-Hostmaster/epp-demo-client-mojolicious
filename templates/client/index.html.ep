@@ -61,7 +61,7 @@
                 </div>
 
                 % foreach my $key (sort keys %{$command_reply}) {
-                %    next if $key =~ m/(msg|code|xml)/;
+                %    next if $key =~ m/^(msg|code|xml)$/;
                 <div class="form-group row">
                     <label class="col-sm-3 control-label"><%= $key %></label>
                     <div class="col-sm-9">
