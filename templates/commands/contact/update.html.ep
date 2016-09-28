@@ -1,6 +1,24 @@
 <%= include 'includes/input_contact' %>
 
 <div class="form-group form-inline">
+    <label class="col-sm-3 control-label">User type*</label>
+    <div class="col-sm-9">
+        <select name="contact.usertype" class="form-control">
+            % my $usertype = session 'contact.usertype';
+            <option <%= $usertype eq '' ? 'selected="selected"' : '' %> value="">-- select --</option>
+            <option <%= $usertype eq 'company' ? 'selected="selected"' : '' %> value="company">company</option>
+            <option <%= $usertype eq 'public_organization' ? 'selected="selected"' : '' %> value="public_organization">public_organization</option>
+            <option <%= $usertype eq 'association' ? 'selected="selected"' : '' %> value="association">association</option>
+            <option <%= $usertype eq 'individual' ? 'selected="selected"' : '' %> value="individual">individual</option>
+            <option <%= $usertype eq 'C' ? 'selected="selected"' : '' %> value="C">C</option>
+            <option <%= $usertype eq 'P' ? 'selected="selected"' : '' %> value="P">P</option>
+            <option <%= $usertype eq 'A' ? 'selected="selected"' : '' %> value="A">A</option>
+            <option <%= $usertype eq 'I' ? 'selected="selected"' : '' %> value="I">I</option>
+        </select>
+    </div>
+</div>
+
+<div class="form-group form-inline">
     <label class="col-sm-3 control-label">New password</label>
     <div class="col-sm-9">
         <input type="text" class="form-control" name="contact.new_password">
@@ -109,5 +127,12 @@
     <label class="col-sm-3 control-label">Secondary E-mail</label>
     <div class="col-sm-9">
         <input type="text" class="form-control" name="contact.email2" value="<%= session 'contact.email2' %>">
+    </div>
+</div>
+
+<div class="form-group form-inline">
+    <label class="col-sm-3 control-label">EAN</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" name="contact.ean" value="<%= session 'contact.ean' %>">
     </div>
 </div>

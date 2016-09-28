@@ -393,7 +393,9 @@ sub startup {
                 my $cvr = $self->param('contact.cvr');
                 my $pnumber = $self->param('contact.pnumber');
                 my $attention = $self->param('contact.attention');
-                if($email2 || $mobilephone || $cvr || $pnumber || $attention) {
+                my $usertype = $self->param('contact.usertype');
+                my $ean = $self->param('contact.ean');
+                if($email2 || $mobilephone || $cvr || $pnumber || $attention || $usertype || $ean) {
                     my $extension = $frame->createElement('extension');
 
                     _add_extension_element($frame, 'dkhm:attention', $attention, $extension);
@@ -401,6 +403,8 @@ sub startup {
                     _add_extension_element($frame, 'dkhm:CVR', $cvr, $extension);
                     _add_extension_element($frame, 'dkhm:mobilephone', $mobilephone, $extension);
                     _add_extension_element($frame, 'dkhm:secondaryEmail', $email2, $extension);
+                    _add_extension_element($frame, 'dkhm:EAN', $ean, $extension);
+                    _add_extension_element($frame, 'dkhm:userType', $usertype, $extension);
 
                     $frame->getNode('command')->appendChild($extension);
                 }
@@ -421,6 +425,7 @@ sub startup {
                 'contact.email2'      => $self->param('contact.email2'),
                 'contact.usertype'    => $self->param('contact.usertype'),
                 'contact.cvr'         => $self->param('contact.cvr'),
+                'contact.ean'         => $self->param('contact.ean'),
                 'contact.pnumber'     => $self->param('contact.pnumber'),
                 'contact.attention'   => $self->param('contact.attention'),
             );
