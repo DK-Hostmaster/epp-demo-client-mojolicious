@@ -164,11 +164,11 @@ sub startup {
             my $algorithms   = $self->every_param('new_ds_algorithm');
             my $digest_types = $self->every_param('new_ds_digest_type');
             my $digests      = $self->every_param('new_ds_digest');
-            while ( @$keytags ) {
-                my $keytag       = shift @$keytags;
-                my $algorithm    = shift @$algorithms;
-                my $digest_type  = shift @$digest_types;
-                my $digest       = shift @$digests;
+            while ( @{$keytags} ) {
+                my $keytag       = shift @{$keytags};
+                my $algorithm    = shift @{$algorithms};
+                my $digest_type  = shift @{$digest_types};
+                my $digest       = shift @{$digests};
                 next unless $keytag || $algorithm || $digest_type || $digest;
 
                 my $extension = $frame->getNode('extension');
