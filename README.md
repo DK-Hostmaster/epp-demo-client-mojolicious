@@ -49,7 +49,7 @@ In addition to the above Perl modules, the client uses [Twitter Bootstrap](http:
 
 # SEE ALSO
 
-For information on the service, please refer to [the specification](https://github.com/DK-Hostmaster/epp-service-specification) from DK Hostmaster or [the service main page with DK Hostmaster](https://www.dk-hostmaster.dk/english/technical-administration/tech-notes/epp/).
+For information on the service, please refer to [the specification](https://github.com/DK-Hostmaster/epp-service-specification) from DK Hostmaster or [the service page with DK Hostmaster](https://www.dk-hostmaster.dk/en/epp).
 
 The main site for this client is the Github repository.
 
