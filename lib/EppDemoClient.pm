@@ -29,6 +29,8 @@ use TryCatch;
 sub startup {
     my $self = shift;
 
+    my $config = $self->plugin('Config');
+
     # Router
     my $r = $self->routes;
 

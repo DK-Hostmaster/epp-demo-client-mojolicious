@@ -117,13 +117,9 @@
                         <label class="col-sm-3 control-label">EPP server</label>
                         <div class="col-sm-9">
                             <select name="hostname" class="form-control">
-                                <option <%= $host eq 'clb2002.dk-hostmaster.dk' ? 'selected="selected"' : '' %> value="clb2002.dk-hostmaster.dk">clb2002.dk-hostmaster.dk</option>
-                                <option <%= $host eq 'epp-lb1.sand.dkhm.dk' ? 'selected="selected"' : '' %> value="epp-lb1.sand.dkhm.dk">epp-lb1.sand.dkhm.dk</option>
-                                <option <%= $host eq 'epp-evaluation.dk-hostmaster.dk' ? 'selected="selected"' : '' %> value="epp-evaluation.dk-hostmaster.dk">epp-evaluation.dk-hostmaster.dk</option>
-                                <option <%= $host eq 'epp-sandbox.dk-hostmaster.dk' ? 'selected="selected"' : '' %> value="epp-sandbox.dk-hostmaster.dk">epp-sandbox.dk-hostmaster.dk</option>
-                                <option <%= $host eq 'epp1.dev.dkhm.dk' ? 'selected="selected"' : '' %> value="epp1.dev.dkhm.dk">epp1.dev.dkhm.dk</option>
-                                <option <%= $host eq 'localhost' ? 'selected="selected"' : '' %> value="localhost">localhost</option>
-                                <option <%= $host eq 'epp-test-sandbox.dk-hostmaster.dk' ? 'selected="selected"' : '' %> value="epp-test-sandbox.dk-hostmaster.dk">epp-test-sandbox.dk-hostmaster.dk</option>
+                                % foreach my $available_host (@{$available_hosts}) {
+                                    <option <%= $host eq $available_host ? 'selected="selected"' : '' %> value="<%= $available_host %>"><%= $available_host %></option>
+                                % }
                             </select>
                         </div>
                     </div>

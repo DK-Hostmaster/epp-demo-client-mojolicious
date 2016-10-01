@@ -40,6 +40,8 @@ sub index {
         }
     }
 
+    $self->stash(available_hosts => $self->config->{available_hosts});
+
     $self->render();
 }
 
@@ -72,6 +74,8 @@ sub logout {
     delete $self->session->{connection_id};
     $self->stash(message => 'Logged out');
 
+    $self->stash(available_hosts => $self->config->{available_hosts});
+
     $self->render(template => 'client/index');
 }
 
@@ -99,6 +103,8 @@ sub login {
     );
 
     $self->stash(command_reply => $login_reply);
+
+    $self->stash(available_hosts => $self->config->{available_hosts});
 
     $self->render(template => 'client/index');
 }
@@ -192,6 +198,8 @@ sub execute {
             }
 
             unless($login_ok) {
+                $self->stash(available_hosts => $self->config->{available_hosts});
+
                 $self->render(template => 'client/index');
                 return;
             }
@@ -224,6 +232,8 @@ sub execute {
     $self->session(object => $object);
     $self->session(command => $command);
     $self->session(values => $self->commands_from_object($object));
+
+    $self->stash(available_hosts => $self->config->{available_hosts});
 
     $self->render(template => 'client/index');
 }
