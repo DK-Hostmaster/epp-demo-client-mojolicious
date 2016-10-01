@@ -1,3 +1,5 @@
+![screenshot](images/main-screen.png)
+
 # NAME
 
 DK Hostmaster EPP service demo client
