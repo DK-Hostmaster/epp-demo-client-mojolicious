@@ -21,7 +21,9 @@
     <p>
       <ul>
         <li><a target="_blank" href="https://www.dk-hostmaster.dk/en/epp">DK Hostmaster A/S EPP Service page</a></li> 
-        <li><a target="_blank" href="https://github.com/DK-Hostmaster/epp-service-specification">Official service specification</a></li>
+        <li><a target="_blank" href="https://github.com/DK-Hostmaster/epp-service-specification">Official EPP service specification</a></li>
+        <li><a target="_blank" href="https://github.com/DK-Hostmaster/epp-xsd-files">Official XSD repository</a></li>
+        <li><a target="_blank" href="https://github.com/DK-Hostmaster/epp-demo-client-mojolicious">EPP demo/test client repository</a></li>
       </ul>
     <p>
   </body>
