@@ -702,23 +702,6 @@ sub startup {
 
             _text_element_into( $epp_frame, 'dkhm:contact_validated', $info, 'validated' );
 
-            $self->session(
-                'contact.street'      => $info->{street},
-                'contact.city'        => $info->{city},
-                'contact.zipcode'     => $info->{pc},
-                'contact.country'     => $info->{cc},
-                'contact.name'        => $info->{name},
-                #'contact.org'         => $self->param('contact.org'),
-                'contact.voice'       => $info->{voice},
-                #'contact.mobilephone' => $self->param('contact.mobilephone'),
-                'contact.fax'         => $info->{fax},
-                #'contact.email'       => $info->{email},
-                #'contact.email2'      => $self->param('contact.email2'),
-                #'contact.usertype'    => $self->param('contact.usertype'),
-                #'contact.cvr'         => $self->param('contact.cvr'),
-                #'contact.pnumber'     => $self->param('contact.pnumber'),
-            );
-
         }
 
         my $contact_created_element = ($epp_frame->getElementsByTagName('contact:creData'))[0];
