@@ -662,7 +662,9 @@ sub startup {
             _text_element_into( $epp_frame, 'domain:registrant', $info, 'registrant' );
 
             foreach my $ele ( _elements( $epp_frame, 'domain:contact' ) ) {
-                $info->{ $ele->{"-type"} } = $ele->{"#text"};
+                my $type = $ele->getAttribute("type");
+                my $userid = $ele->textContent;
+                $info->{ $type } = $userid;
             }
 
             _text_element_into( $epp_frame, 'domain:hostObj',    $info, 'ns' );
@@ -751,6 +753,22 @@ sub startup {
             my $message_element = ($msgq_element->getElementsByTagName('msg'))[0];
             if($message_element) {
                 $info->{msg} = $message_element->textContent;
+            }
+        }
+
+        my $extension_element = ($epp_frame->getElementsByTagName('extension'))[0];
+        if($extension_element) {
+            my $info = ( $reply->{extension} //= {} );
+            _text_element_into( $epp_frame, 'dkhm:attention',   $info, 'dkhm:attention' );
+            _text_element_into( $epp_frame, 'dkhm:mobilephone', $info, 'dkhm:mobilephone' );
+            _text_element_into( $epp_frame, 'dkhm:secondaryEmail', $info, 'dkhm:secondaryEmail' );
+            _text_element_into( $epp_frame, 'dkhm:contact_validated', $info, 'dkhm:contact_validated' );
+
+            foreach my $ele ( _elements( $epp_frame, 'dkhm:domainAdvisory' ) ) {
+                my $advisory = $ele->getAttribute("advisory");
+                my $domain   = $ele->getAttribute("domain");
+                my $date     = $ele->getAttribute("date");
+                $info->{ "Advisory: $advisory" } = join ' / ', $domain, $date//();
             }
         }
 
