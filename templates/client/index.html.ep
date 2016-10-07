@@ -181,7 +181,7 @@
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="request_form">
 
-                % my $object = session 'object';
+                % my $object = session('object') || '';
                 % my $command = session 'command';
 
                 <div class="row">
