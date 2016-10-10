@@ -413,8 +413,12 @@ sub startup {
 
             }
 
+            my ($street1, $street2, $street3) = @{$self->every_param('contact.street')};
+
             $self->session(
-                'contact.street'      => $self->param('contact.street'),
+                'contact.street'      => $street1,
+                'contact.street2'     => $street2,
+                'contact.street3'     => $street3,
                 'contact.city'        => $self->param('contact.city'),
                 'contact.zipcode'     => $self->param('contact.zipcode'),
                 'contact.country'     => $self->param('contact.country'),
