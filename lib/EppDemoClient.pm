@@ -682,6 +682,7 @@ sub startup {
 
             _text_element_into( $epp_frame, 'contact:id',     $info, 'id'   );
             _text_element_into( $epp_frame, 'contact:roid',   $info, 'roid' );
+            _text_element_into( $epp_frame, 'contact:org',    $info, 'org'  );
             _text_element_into( $epp_frame, 'contact:name',   $info, 'name' );
             _text_element_into( $epp_frame, 'contact:street', $info, 'street' );
             _text_element_into( $epp_frame, 'contact:city',   $info, 'city' );
