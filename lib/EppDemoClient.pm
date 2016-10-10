@@ -305,7 +305,7 @@ sub startup {
 
         if($object eq 'contact') {
             my $addr = {
-                street => [$self->param('contact.street')],
+                street => $self->every_param('contact.street'),
                 city   => $self->param('contact.city'),
                 pc     => $self->param('contact.zipcode'),
                 cc     => $self->param('contact.country'),
@@ -345,7 +345,7 @@ sub startup {
 
             } elsif ($command eq 'update') {
 
-                if($self->param('contact.street')) {
+                if($addr->{street}[0]) {
                     $frame->chgPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
                 } elsif ($self->param('contact.name')) {
                     $frame->chgPostalInfo('loc', $self->param('contact.name'), undef, undef);
@@ -353,7 +353,7 @@ sub startup {
                     $frame->getNode('contact:postalInfo')->removeChild($addrnode);
                 }
 
-                if(!$self->param('contact.name') && $self->param('contact.street')) {
+                if(!$self->param('contact.name') && $addr->{street}[0]) {
                     my $namenode = $frame->getNode('contact:name');
                     $frame->getNode('contact:postalInfo')->removeChild($namenode);
                 }
