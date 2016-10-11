@@ -4,7 +4,7 @@
     <label class="col-sm-3 control-label">User type*</label>
     <div class="col-sm-9">
         <select name="contact.usertype" class="form-control">
-            % my $usertype = session 'contact.usertype';
+            % my $usertype = session('contact.usertype') || '';
             <option <%= $usertype eq '' ? 'selected="selected"' : '' %> value="">-- select --</option>
             <option <%= $usertype eq 'company' ? 'selected="selected"' : '' %> value="company">company</option>
             <option <%= $usertype eq 'public_organization' ? 'selected="selected"' : '' %> value="public_organization">public_organization</option>
@@ -29,13 +29,6 @@
     <label class="col-sm-3 control-label">Name*</label>
     <div class="col-sm-9">
         <input type="text" class="form-control" name="contact.name" value="<%= session 'contact.name' %>">
-    </div>
-</div>
-
-<div class="form-group form-inline">
-    <label class="col-sm-3 control-label">Attention</label>
-    <div class="col-sm-9">
-        <input type="text" class="form-control" name="contact.attention" value="<%= session 'contact.attention' %>">
     </div>
 </div>
 

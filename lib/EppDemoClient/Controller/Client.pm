@@ -141,11 +141,13 @@ sub _perform_login {
         $self->app->log->info("Logged in, save connection_id " . $login_reply->{transaction_id});
     }
 
-    my $hello = Net::EPP::Frame::Hello->new;
-    $self->app->log->info("Sending hello command [" . $hello->toString . "]");
-    my $answer = $epp->request($hello);
-    $self->app->log->info("Reply to hello command [" . $answer->toString . "]");
-    $self->stash(hello_reply => $answer->toString);
+    if($login_reply->{code} == 1000) {
+        my $hello = Net::EPP::Frame::Hello->new;
+        $self->app->log->info("Sending hello command [" . $hello->toString . "]");
+        my $answer = $epp->request($hello);
+        $self->app->log->info("Reply to hello command [" . $answer->toString . "]");
+        $self->stash(hello_reply => $answer->toString);
+    }
 
     return $login_reply;
 }

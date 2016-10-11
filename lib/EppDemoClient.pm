@@ -394,13 +394,11 @@ sub startup {
                 my $mobilephone = $self->param('contact.mobilephone');
                 my $cvr = $self->param('contact.cvr');
                 my $pnumber = $self->param('contact.pnumber');
-                my $attention = $self->param('contact.attention');
                 my $usertype = $self->param('contact.usertype');
                 my $ean = $self->param('contact.ean');
-                if($email2 || $mobilephone || $cvr || $pnumber || $attention || $usertype || $ean) {
+                if($email2 || $mobilephone || $cvr || $pnumber || $usertype || $ean) {
                     my $extension = $frame->createElement('extension');
 
-                    _add_extension_element($frame, 'dkhm:attention', $attention, $extension);
                     _add_extension_element($frame, 'dkhm:pnumber', $pnumber, $extension);
                     _add_extension_element($frame, 'dkhm:CVR', $cvr, $extension);
                     _add_extension_element($frame, 'dkhm:mobilephone', $mobilephone, $extension);
@@ -433,7 +431,6 @@ sub startup {
                 'contact.cvr'         => $self->param('contact.cvr'),
                 'contact.ean'         => $self->param('contact.ean'),
                 'contact.pnumber'     => $self->param('contact.pnumber'),
-                'contact.attention'   => $self->param('contact.attention'),
             );
         }
 
@@ -747,7 +744,6 @@ sub startup {
         my $extension_element = ($epp_frame->getElementsByTagName('extension'))[0];
         if($extension_element) {
             my $info = ( $reply->{extension} //= {} );
-            _text_element_into( $epp_frame, 'dkhm:attention',   $info, 'dkhm:attention' );
             _text_element_into( $epp_frame, 'dkhm:mobilephone', $info, 'dkhm:mobilephone' );
             _text_element_into( $epp_frame, 'dkhm:secondaryEmail', $info, 'dkhm:secondaryEmail' );
             _text_element_into( $epp_frame, 'dkhm:contact_validated', $info, 'dkhm:contact_validated' );
