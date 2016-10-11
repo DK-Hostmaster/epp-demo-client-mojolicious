@@ -70,8 +70,8 @@
                             % foreach my $key2 (sort keys %{$val}) {
                             % my($val2) = $val->{$key2};
                             <div class="form-group row">
-                                <label class="col-sm-3 control-label"><%= $key2 %></label>
-                                <div class="col-sm-9">
+                                <label class="col-sm-6 control-label"><%= $key2 %></label>
+                                <div class="col-sm-6">
                                     <%= $val2 %>
                                 </div>
                             </div>
