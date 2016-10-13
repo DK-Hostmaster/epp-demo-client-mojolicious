@@ -214,7 +214,7 @@ sub startup {
                     $frame->getNode('command')->appendChild($extension);
                 }
                 my $token_el = $frame->createElement('dkhm:orderconfirmationToken');
-                $token_el->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.5', 'dkhm');
+                $token_el->setNamespace('urn:dkhm:params:xml:ns:dkhm-2.0', 'dkhm');
                 $token_el->appendText($orderconfirmationtoken);
                 $extension->appendChild($token_el);
             }
@@ -286,7 +286,7 @@ sub startup {
             my $extension = $frame->createElement('extension');
 
             my $nsa_element = $frame->createElement('dkhm:requestedNsAdmin');
-            $nsa_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.5', 'dkhm');
+            $nsa_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-2.0', 'dkhm');
             $nsa_element->appendText($requestedNsAdmin);
 
             $extension->appendChild($nsa_element);
@@ -317,20 +317,20 @@ sub startup {
                 my $extension = $frame->createElement('extension');
 
                 my $user_type_element = $frame->createElement('dkhm:userType');
-                $user_type_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.2', 'dkhm');
+                $user_type_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-2.0', 'dkhm');
                 $user_type_element->appendText($self->param('contact.usertype'));
                 $extension->appendChild($user_type_element);
 
                 if ($self->param('contact.cvr')) {
                     my $cvr_element = $frame->createElement('dkhm:CVR');
-                    $cvr_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.2', 'dkhm');
+                    $cvr_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-2.0', 'dkhm');
                     $cvr_element->appendText($self->param('contact.cvr'));
                     $extension->appendChild($cvr_element);
                 }
 
                 if ($self->param('contact.pnumber')) {
                     my $pnr_element = $frame->createElement('dkhm:pnumber');
-                    $pnr_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.4', 'dkhm');
+                    $pnr_element->setNamespace('urn:dkhm:params:xml:ns:dkhm-2.0', 'dkhm');
                     $pnr_element->appendText($self->param('contact.pnumber'));
                     $extension->appendChild($pnr_element);
                 }
@@ -826,7 +826,7 @@ sub _add_extension_element {
 
     if($value) {
         my $element = $xml_frame->createElement($element_name);
-        $element->setNamespace('urn:dkhm:params:xml:ns:dkhm-1.5', 'dkhm');
+        $element->setNamespace('urn:dkhm:params:xml:ns:dkhm-2.0', 'dkhm');
         $element->appendText($value);
         $extension_element->appendChild($element);
     }
