@@ -348,7 +348,7 @@ sub startup {
                 if($addr->{street}[0]) {
                     $frame->chgPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
                 } elsif ($self->param('contact.name')) {
-                    $frame->chgPostalInfo('loc', $self->param('contact.name'), undef, undef);
+                    $frame->chgPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), undef);
                     my $addrnode = $frame->getNode('contact:addr');
                     $frame->getNode('contact:postalInfo')->removeChild($addrnode);
                 }
