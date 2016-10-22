@@ -6,12 +6,13 @@
 - [VERSION](#version)
 - [USAGE](#usage)
     - [Using `docker`](#using-docker)
+- [ABOUT](#about)
 - [DEPENDENCIES](#dependencies)
 - [SEE ALSO](#see-also)
 - [Changes](#changes)
     - [1.1.0 feature release](#110-feature-release)
-    - [1.0.1](#101)
-    - [1.0.0](#100)
+    - [1.0.1 bug fix release](#101-bug-fix-release)
+    - [1.0.0 initial release](#100-initial-release)
 - [COPYRIGHT](#copyright)
 - [LICENSE](#license)
 
@@ -20,7 +21,7 @@
 <a name="name"></a>
 # NAME
 
-DK Hostmaster EPP service demo client
+DK Hostmaster EPP service demo/test client
 
 <a name="version"></a>
 # VERSION
@@ -48,6 +49,12 @@ The application can be used using `docker`
 Open your browser at:
 
     https://localhost:3000/
+
+
+<a name="about"></a>
+# ABOUT
+
+This client was developed to assist our testers in testing our own EPP service. As for other services we have previously released clients as open source under a MIT license to provide a springboard for users/developers wanting to get started with our services.
 
 <a name="dependencies"></a>
 # DEPENDENCIES
@@ -88,13 +95,13 @@ The main site for this client is the Github repository.
 
 - Prettifying XML outputted to log for readability
 
-<a name="101"></a>
-## 1.0.1
+<a name="101-bug-fix-release"></a>
+## 1.0.1 bug fix release
 
 - Several bug fixes and adjustments based on inputs from our testers
 
-<a name="100"></a>
-## 1.0.0 
+<a name="100-initial-release"></a>
+## 1.0.0 initial release
 
 - Initial version
 
