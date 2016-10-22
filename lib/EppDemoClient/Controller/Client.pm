@@ -10,6 +10,7 @@ use Net::EPP::Frame::Hello;
 use Mojo::Util qw(xml_escape);
 use Digest::MD5 qw(md5_hex);
 use Time::HiRes;
+use XML::Twig;
 
 # The frontpage.
 sub index {
@@ -27,9 +28,9 @@ sub index {
 
                 $self->app->log->info("Sending hello command [" . $hello->toString . "]");
                 my $answer = $epp->request($hello);
-                $self->app->log->info("Reply to hello command [" . $answer->toString . "]");
+                $self->app->log->info("Reply to hello command [" . toStringPretty($answer->toString) . "]");
                 $self->stash(logged_in => 1);
-                $self->stash(hello_reply => $answer->toString);
+                $self->stash(hello_reply => toStringPretty($answer->toString));
             } catch ($err) {
                 $self->app->log->error("Keep alive call failed: $err");
                 $self->app->expire_connection($connection_id);
@@ -58,7 +59,7 @@ sub logout {
                 $self->app->log->info("Sending logout command [" . $logout->toString . "]");
                 my $start = Benchmark->new;
                 my $answer = $epp->request($logout);
-                $self->app->log->info("Reply to logout command [" . $answer->toString . "]");
+                $self->app->log->info("Reply to logout command [" . toStringPretty($answer->toString) . "]");
                 my $end = Benchmark->new;
                 my $timediff = timediff($end, $start);
                 $self->stash(execute_time => timestr($timediff, 'nop'));
@@ -129,7 +130,7 @@ sub _perform_login {
 
     my $answer = $epp->request($login_command);
 
-    $self->app->log->info("Reply to login command [" . $answer->toString . "]");
+    $self->app->log->info("Reply to login command [" . toStringPretty($answer->toString) . "]");
 
     my $login_reply = $self->parse_reply($answer);
 
@@ -145,8 +146,8 @@ sub _perform_login {
         my $hello = Net::EPP::Frame::Hello->new;
         $self->app->log->info("Sending hello command [" . $hello->toString . "]");
         my $answer = $epp->request($hello);
-        $self->app->log->info("Reply to hello command [" . $answer->toString . "]");
-        $self->stash(hello_reply => $answer->toString);
+        $self->app->log->info("Reply to hello command [" . toStringPretty($answer->toString) . "]");
+        $self->stash(hello_reply => toStringPretty($answer->toString));
     }
 
     return $login_reply;
@@ -176,9 +177,9 @@ sub execute {
                 my $hello = Net::EPP::Frame::Hello->new;
                 $self->app->log->info("Sending hello command [" . $hello->toString . "]");
                 my $answer = $epp->request($hello);
-                $self->app->log->info("Reply to hello command [" . $answer->toString . "]");
+                $self->app->log->info("Reply to hello command [" . toStringPretty($answer->toString) . "]");
                 $self->stash(logged_in => 1);
-                $self->stash(hello_reply => $answer->toString);
+                $self->stash(hello_reply => toStringPretty($answer->toString));
                 $login_ok = 1;
             } catch ($err) {
                 $self->app->log->error("Keep alive call failed: $err");
@@ -210,9 +211,9 @@ sub execute {
         my $frame = $self->get_request_frame;
 
         my $start = Benchmark->new;
-        $self->app->log->info("Sending command [" . $frame->toString . "]");
+        $self->app->log->info("Sending command [" . toStringPretty($frame->toString) . "]");
         my $answer = $epp->request($frame);
-        $self->app->log->info("Reply to command [" . $answer->toString . "]");
+        $self->app->log->info("Reply to command [" . toStringPretty($answer->toString) . "]");
         my $end = Benchmark->new;
         my $timediff = timediff($end, $start);
         $self->stash(execute_time => timestr($timediff, 'nop'));
@@ -238,6 +239,15 @@ sub execute {
     $self->stash(available_hosts => $self->config->{available_hosts});
 
     $self->render(template => 'client/index');
+}
+
+sub toStringPretty {
+    my $xml = shift;
+
+    my $t= XML::Twig->new( pretty_print => 'record');
+    $t->parse($xml);
+
+    return $t->sprint;
 }
 
 1;
