@@ -619,6 +619,22 @@ sub startup {
             }
         }
 
+        my $hostname_element = ($epp_frame->getElementsByTagName('host:name'))[0];
+        if($hostname_element) {
+            $reply->{host} = $hostname_element->textContent;
+            if (defined $hostname_element->getAttribute('avail')) {
+                $reply->{avail} = $hostname_element->getAttribute('avail');
+            }
+        }
+
+        my $contactid_element = ($epp_frame->getElementsByTagName('contact:id'))[0];
+        if($contactid_element) {
+            $reply->{host} = $contactid_element->textContent;
+            if (defined $contactid_element->getAttribute('avail')) {
+                $reply->{avail} = $contactid_element->getAttribute('avail');
+            }
+        }
+
         my $host_element = ($epp_frame->getElementsByTagName('host:infData'));
         if($host_element) {
             my $info = ( $reply->{host_data} //= {} );
@@ -703,9 +719,6 @@ sub startup {
                 $info->{ $status } = $s;
                 $status .= " ";
             }
-
-            _text_element_into( $epp_frame, 'dkhm:contact_validated', $info, 'validated' );
-
         }
 
         my $contact_created_element = ($epp_frame->getElementsByTagName('contact:creData'))[0];
