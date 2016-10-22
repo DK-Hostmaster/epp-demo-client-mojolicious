@@ -703,9 +703,6 @@ sub startup {
                 $info->{ $status } = $s;
                 $status .= " ";
             }
-
-            _text_element_into( $epp_frame, 'dkhm:contact_validated', $info, 'validated' );
-
         }
 
         my $contact_created_element = ($epp_frame->getElementsByTagName('contact:creData'))[0];
