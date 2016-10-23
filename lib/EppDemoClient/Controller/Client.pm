@@ -26,7 +26,7 @@ sub index {
             try {
                 my $hello = Net::EPP::Frame::Hello->new;
 
-                $self->app->log->info("Sending hello command [" . $hello->toString . "]");
+                $self->app->log->info("Sending hello command [" . toStringPretty($hello->toString) . "]");
                 my $answer = $epp->request($hello);
                 $self->app->log->info("Reply to hello command [" . toStringPretty($answer->toString) . "]");
                 $self->stash(logged_in => 1);
@@ -56,7 +56,7 @@ sub logout {
 
             try {
                 my $logout = $self->get_logout_request;
-                $self->app->log->info("Sending logout command [" . $logout->toString . "]");
+                $self->app->log->info("Sending logout command [" . toStringPretty($logout->toString) . "]");
                 my $start = Benchmark->new;
                 my $answer = $epp->request($logout);
                 $self->app->log->info("Reply to logout command [" . toStringPretty($answer->toString) . "]");
@@ -126,7 +126,7 @@ sub _perform_login {
         SSL_verifycn_name   => $hostname,
     );
 
-    $self->app->log->info("Sending login command [" . $login_command->toString . "]");
+    $self->app->log->info("Sending login command [" . toStringPretty($login_command->toString) . "]");
 
     my $answer = $epp->request($login_command);
 
@@ -144,7 +144,7 @@ sub _perform_login {
 
     if($login_reply->{code} == 1000) {
         my $hello = Net::EPP::Frame::Hello->new;
-        $self->app->log->info("Sending hello command [" . $hello->toString . "]");
+        $self->app->log->info("Sending hello command [" . toStringPretty($hello->toString) . "]");
         my $answer = $epp->request($hello);
         $self->app->log->info("Reply to hello command [" . toStringPretty($answer->toString) . "]");
         $self->stash(hello_reply => toStringPretty($answer->toString));
@@ -175,7 +175,7 @@ sub execute {
         if ($epp) {
             try {
                 my $hello = Net::EPP::Frame::Hello->new;
-                $self->app->log->info("Sending hello command [" . $hello->toString . "]");
+                $self->app->log->info("Sending hello command [" . toStringPretty($hello->toString) . "]");
                 my $answer = $epp->request($hello);
                 $self->app->log->info("Reply to hello command [" . toStringPretty($answer->toString) . "]");
                 $self->stash(logged_in => 1);
