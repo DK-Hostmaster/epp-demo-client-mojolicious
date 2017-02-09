@@ -1,0 +1,5 @@
+%layout 'default';
+<h2>Exception</h1>
+<p><%= $exception->message =~ s/ at \S+ line \d+//gr %></p>
+<br/>
+<a href="/">Back</a>
