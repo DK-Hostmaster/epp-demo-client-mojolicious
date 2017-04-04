@@ -22,7 +22,7 @@ The application can be used using `docker`
 
     $ docker build -t epp-demo-client .
 
-    $ docker run --rm -p 3000:3000 -name epp-demo-client epp-demo-client
+    $ docker run --rm -p 3000:3000 --name epp-demo-client epp-demo-client
 
 Open your browser at:
 
