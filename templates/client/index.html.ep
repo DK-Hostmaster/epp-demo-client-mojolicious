@@ -118,7 +118,7 @@
                         <div class="col-sm-9">
                             <select name="hostname" class="form-control">
                                 % foreach my $available_host (@{$available_hosts}) {
-                                    <option <%= $host eq $available_host ? 'selected="selected"' : '' %> value="<%= $available_host %>"><%= $available_host %></option>
+                                    <option <%= $host && $host eq $available_host ? 'selected="selected"' : '' %> value="<%= $available_host %>"><%= $available_host %></option>
                                 % }
                             </select>
                         </div>

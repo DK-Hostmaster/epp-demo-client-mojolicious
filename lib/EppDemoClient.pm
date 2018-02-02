@@ -760,6 +760,9 @@ sub startup {
             _text_element_into( $epp_frame, 'dkhm:mobilephone', $info, 'dkhm:mobilephone' );
             _text_element_into( $epp_frame, 'dkhm:secondaryEmail', $info, 'dkhm:secondaryEmail' );
             _text_element_into( $epp_frame, 'dkhm:contact_validated', $info, 'dkhm:contact_validated' );
+            _text_element_into( $epp_frame, 'dkhm:domain_confirmed', $info, 'dkhm:domain_confirmed' );
+            _text_element_into( $epp_frame, 'dkhm:registrant_validated', $info, 'dkhm:registrant_validated' );
+            _text_element_into( $epp_frame, 'dkhm:risk_assessment', $info, 'dkhm:risk_assessment' );
 
             foreach my $ele ( _elements( $epp_frame, 'dkhm:domainAdvisory' ) ) {
                 my $advisory = $ele->getAttribute("advisory");

@@ -116,6 +116,7 @@ sub _perform_login {
 
     $self->app->log->info("Connecting to $hostname:$port");
 
+    # Notice. This may fail if connection cannot be established. This returns invalid XML. TODO: FIX.
     my $epp = $self->epp_client($hostname, $port);
 
     my $greeting = $epp->connect(
