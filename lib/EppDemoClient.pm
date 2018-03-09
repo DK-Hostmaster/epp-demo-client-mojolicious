@@ -300,7 +300,7 @@ sub startup {
         }
 
         if($object eq 'contact' and $command eq 'create') {
-            $frame->setContact('auto');
+            $frame->setContact( $self->param('contact.userid') // 'auto' );
         }
 
         if($object eq 'contact') {
@@ -431,6 +431,7 @@ sub startup {
                 'contact.cvr'         => $self->param('contact.cvr'),
                 'contact.ean'         => $self->param('contact.ean'),
                 'contact.pnumber'     => $self->param('contact.pnumber'),
+                'contact.userid'      => $self->param('contact.userid'),
             );
         }
 
