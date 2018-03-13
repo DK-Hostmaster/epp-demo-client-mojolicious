@@ -630,7 +630,7 @@ sub startup {
 
         my $contactid_element = ($epp_frame->getElementsByTagName('contact:id'))[0];
         if($contactid_element) {
-            $reply->{host} = $contactid_element->textContent;
+            $reply->{id} = $contactid_element->textContent;
             if (defined $contactid_element->getAttribute('avail')) {
                 $reply->{avail} = $contactid_element->getAttribute('avail');
             }
