@@ -800,6 +800,7 @@ sub startup {
     $r->get('/logout')->to('client#logout');
     $r->post('/login')->to('client#login');
     $r->post('/execute')->to('client#execute');
+    $r->get('/execute' => sub{ shift->redirect_to('/') });
 
     # Ajax requests
     $r->post('/get_login_xml')->to('ajax#get_login_xml');
