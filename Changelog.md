@@ -1,5 +1,9 @@
 # Changelog for EPP Demo Client
 
+## 1.1.0 2019-01-22 Feature release, Update recommended
+
+- Added support for DNSSEC extension, issue #25
+
 ## 1.0.2 2018-02-02
 
 - Added propagation of the risk assessment to the poll message for create domain name
