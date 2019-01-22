@@ -6,7 +6,7 @@ DK Hostmaster EPP service demo client
 
 # VERSION
 
-This documentation describes version 1.0.2
+This documentation describes version 1.1.0
 
 # USAGE
 
@@ -57,7 +57,7 @@ The main site for this client is the Github repository.
 
 # COPYRIGHT
 
-This software is under copyright by DK Hostmaster A/S 2016-2018
+This software is under copyright by DK Hostmaster A/S 2016-2019
 
 # LICENSE
 
