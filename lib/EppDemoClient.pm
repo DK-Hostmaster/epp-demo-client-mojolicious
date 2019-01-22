@@ -440,6 +440,13 @@ sub startup {
             $frame->chgRegistrant( $change_registrant );
         }
 
+        my $remove_all   = $self->param('rem_all_dsrecords');
+        if ( $remove_all ) {
+            my $op_element   = _add_ds_extension_element($frame, 'rem', 1);
+            my $data_element = $frame->createElement('secDNS:all');
+            $data_element->appendText( "true" );
+            $op_element->appendChild($data_element);
+        }
 
         foreach my $op ( 'rem', 'add' ) {
 
@@ -454,25 +461,7 @@ sub startup {
                 my $digest       = shift @$digests;
                 next unless $keytag || $algorithm || $digest_type || $digest;
 
-                my $extension = $frame->getNode('extension');
-                if ( ! $extension ) {
-                    $extension = $frame->createElement('extension');
-                    $frame->getNode('command')->appendChild($extension);
-                }
-
-                my $update = $frame->getNode('secDNS:update');
-                if ( ! $update ) {
-                    $update = $frame->createElement('update');
-                    $update->setNamespace( 'urn:ietf:params:xml:ns:secDNS-1.1', 'secDNS' );
-                    $extension->appendChild($update);
-                }
-
-                my $op_element = $frame->getNode("secDNS:${op}");
-                if ( ! $op_element ) {
-                    $op_element = $frame->createElement("secDNS:${op}");
-                    $update->appendChild($op_element);
-                }
-
+                my $op_element = _add_ds_extension_element($frame, $op);
 
                 my $data_element = $frame->createElement('secDNS:dsData');
 
@@ -848,6 +837,35 @@ sub _add_extension_element {
         $element->appendText($value);
         $extension_element->appendChild($element);
     }
+}
+
+sub _add_ds_extension_element {
+    my($frame, $op, $urgent) = @_;
+
+    my $extension = $frame->getNode('extension');
+    if ( ! $extension ) {
+        $extension = $frame->createElement('extension');
+        $frame->getNode('command')->appendChild($extension);
+    }
+
+    my $update = $frame->getNode('secDNS:update');
+    if ( ! $update ) {
+        $update = $frame->createElement('update');
+        $update->setNamespace( 'urn:ietf:params:xml:ns:secDNS-1.1', 'secDNS' );
+
+        if ( $urgent ) {
+            $update->setAttribute( 'urgent' , 'true' );
+        }
+        $extension->appendChild($update);
+    }
+
+    my $op_element = $frame->getNode("secDNS:${op}");
+    if ( ! $op_element ) {
+        $op_element = $frame->createElement("secDNS:${op}");
+        $update->appendChild($op_element);
+    }
+
+    return $op_element;
 }
 
 # Central storage of connections to the EPP server. The connection id
