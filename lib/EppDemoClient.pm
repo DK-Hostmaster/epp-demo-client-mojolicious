@@ -300,7 +300,7 @@ sub startup {
         }
 
         if($object eq 'contact' and $command eq 'create') {
-            $frame->setContact('auto');
+            $frame->setContact( $self->param('contact.userid') // 'auto' );
         }
 
         if($object eq 'contact') {
@@ -431,6 +431,7 @@ sub startup {
                 'contact.cvr'         => $self->param('contact.cvr'),
                 'contact.ean'         => $self->param('contact.ean'),
                 'contact.pnumber'     => $self->param('contact.pnumber'),
+                'contact.userid'      => $self->param('contact.userid'),
             );
         }
 
@@ -629,7 +630,7 @@ sub startup {
 
         my $contactid_element = ($epp_frame->getElementsByTagName('contact:id'))[0];
         if($contactid_element) {
-            $reply->{host} = $contactid_element->textContent;
+            $reply->{id} = $contactid_element->textContent;
             if (defined $contactid_element->getAttribute('avail')) {
                 $reply->{avail} = $contactid_element->getAttribute('avail');
             }
@@ -799,6 +800,7 @@ sub startup {
     $r->get('/logout')->to('client#logout');
     $r->post('/login')->to('client#login');
     $r->post('/execute')->to('client#execute');
+    $r->get('/execute' => sub{ shift->redirect_to('/') });
 
     # Ajax requests
     $r->post('/get_login_xml')->to('ajax#get_login_xml');
