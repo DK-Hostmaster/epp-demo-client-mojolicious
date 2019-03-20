@@ -7,6 +7,19 @@
     </div>
 </div>
 
+<div id="authinfo">
+    <div class="form-group form-inline">
+        <label class="col-sm-3 control-label">Authinfo Token</label>
+        <div class="col-sm-9">
+            <select name="authinfo_gen_clear" class="form-control" id="authinfo_gen_clean">
+                <option value="none"></option>
+                <option value="generate">Generate</option>
+                <option value="clear">Clear</option>
+            </select>
+        </div>
+    </div>
+</div>
+
 <div id="rem_nameservers">
     <div class="form-group form-inline rem_nameserver">
         <label class="col-sm-3 control-label">Remove nameserver</label>
@@ -98,3 +111,4 @@
         </div>
     </div>
 </div>
+

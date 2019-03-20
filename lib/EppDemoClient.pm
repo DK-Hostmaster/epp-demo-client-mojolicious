@@ -440,6 +440,13 @@ sub startup {
             $frame->chgRegistrant( $change_registrant );
         }
 
+        my $authinfo_gen_clear = $self->param('authinfo_gen_clear');
+        if ($authinfo_gen_clear eq 'generate') {
+            $frame->chgAuthInfo('AUTO');
+        }
+        elsif ($authinfo_gen_clear eq 'clear') {
+            $frame->chgAuthInfo('');
+        }
 
         foreach my $op ( 'rem', 'add' ) {
 
