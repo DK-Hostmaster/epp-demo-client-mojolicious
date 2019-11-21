@@ -440,6 +440,14 @@ sub startup {
             $frame->chgRegistrant( $change_registrant );
         }
 
+        my $authinfo_gen_clear = $self->param('authinfo_gen_clear');
+        if ($authinfo_gen_clear eq 'generate') {
+            $frame->chgAuthInfo('AUTO');
+        }
+        elsif ($authinfo_gen_clear eq 'clear') {
+            $frame->chgAuthInfo('');
+        }
+
         my $remove_all   = $self->param('rem_all_dsrecords');
         if ( $remove_all ) {
             my $op_element   = _add_ds_extension_element($frame, 'rem', 1);
