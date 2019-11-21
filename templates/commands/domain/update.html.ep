@@ -64,6 +64,15 @@
     </div>
 </div>
 
+<div id="rem_all_dsrecords">
+    <div class="form-group form-inline rem_all_dsrecords">
+        <label class="col-sm-3 control-label">Remove all DS records</label>
+        <div class="col-sm-9">
+            <input type="checkbox" class="form-control" name="rem_all_dsrecords" value="1">
+        </div>
+    </div>
+</div>
+
 <div id="rem_dss">
     <div class="form-group form-inline rem_ds">
         <label class="col-sm-3 control-label">Remove DS</label>
