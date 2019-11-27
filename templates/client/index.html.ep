@@ -105,7 +105,7 @@
         <li role="presentation"><a href="#login_xml" aria-controls="login_xml" role="tab" data-toggle="tab">Request XML</a></li>
     </ul>
 
-    %= form_for 'login', method=>'POST', class=>'form-horizontal', style=>'padding-top: 20px;', begin
+    %= form_for 'login', method=>'POST', class=>'form-horizontal', style=>'padding-top: 20px;', id => 'login_form_data', begin
 
     <div class="row">
         <div class="tab-content">
@@ -142,6 +142,22 @@
                         <label for="inputPassword" class="col-sm-3 control-label">Password</label>
                         <div class="col-sm-4">
                             <input type="password" class="form-control" id="inputPassword" placeholder="Password" name="password" value="<%= session 'password'%>">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="xmlns.secDNS" class="col-sm-3 control-label">xmlns secDNS</label>
+                        <div class="col-sm-4">
+                            % $c->param('xmlns.secDNS', $c->session('xmlns.secDNS')) unless $c->param('xmlns.secDNS');
+                            %= select_field "xmlns.secDNS" => [ ["(auto)" => ""], map { [$_ => "urn:ietf:params:xml:ns:secDNS-$_"] } qw(1.1) ];
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="xmlns.dkhm" class="col-sm-3 control-label">xmlns dkhm</label>
+                        <div class="col-sm-4">
+                            % $c->param('xmlns.dkhm', $c->session('xmlns.dkhm')) unless $c->param('xmlns.dkhm');
+                            %= select_field "xmlns.dkhm"   => [ ["(auto)" => ""], map { [$_ => "urn:dkhm:params:xml:ns:dkhm-$_"]   } qw(1.1 1.2 1.3 1.4 1.5 1.6 2.0 2.1 2.2 2.3 2.4 2.5 3.0 3.1 3.2 3.3 3.4 3.5) ];
                         </div>
                     </div>
 

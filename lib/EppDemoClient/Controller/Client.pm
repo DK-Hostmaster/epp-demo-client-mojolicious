@@ -28,6 +28,7 @@ sub index {
                 $self->app->log->info("Sending hello command [" . $hello->toString . "]");
                 my $answer = $epp->request($hello);
                 $self->app->log->info("Reply to hello command [" . $answer->toString . "]");
+                my $hello_reply = $self->parse_reply($answer);
                 $self->stash(logged_in => 1);
                 $self->stash(hello_reply => $answer->toString);
             } catch ($err) {
@@ -66,7 +67,8 @@ sub logout {
                 $self->stash(command_reply => $self->parse_reply($answer));
 
             } catch ($err) {
-                $self->app->log->warn("Failed to send logout command: $err");
+                # Croak traceback may appear at end of $err - We do not need that in output.
+                $self->app->log->warn( sprintf('Failed to send logout command: %s', $err =~ s/\n.*\z//s) );
             }
         }
         $self->app->expire_connection($connection_id);
@@ -147,6 +149,7 @@ sub _perform_login {
         $self->app->log->info("Sending hello command [" . $hello->toString . "]");
         my $answer = $epp->request($hello);
         $self->app->log->info("Reply to hello command [" . $answer->toString . "]");
+        my $hello_reply = $self->parse_reply($answer);
         $self->stash(hello_reply => $answer->toString);
     }
 
@@ -178,6 +181,7 @@ sub execute {
                 $self->app->log->info("Sending hello command [" . $hello->toString . "]");
                 my $answer = $epp->request($hello);
                 $self->app->log->info("Reply to hello command [" . $answer->toString . "]");
+                my $hello_reply = $self->parse_reply($answer);
                 $self->stash(logged_in => 1);
                 $self->stash(hello_reply => $answer->toString);
                 $login_ok = 1;
