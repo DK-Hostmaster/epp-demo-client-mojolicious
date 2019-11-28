@@ -959,7 +959,7 @@ sub commands_from_object {
 #
 sub namespace {
     my($self, $short) = @_;
-    my $name = "xmlns:${short}";
+    my $name = "xmlns.${short}";
     my $ns = $self->param($name) || $self->session($name);
     return( $ns, $short );
 }
