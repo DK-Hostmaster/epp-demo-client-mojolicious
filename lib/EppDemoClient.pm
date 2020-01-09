@@ -68,6 +68,7 @@ sub startup {
     $self->helper(commands_from_object  => \&commands_from_object);
     $self->helper(namespace             => \&namespace);
     $self->helper(elements              => \&_elements);
+    $self->helper(text_elements         => \&_text_elements);
     $self->helper(text_element_into     => \&_text_element_into);
 
     # Normal route to controller
