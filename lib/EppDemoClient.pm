@@ -221,21 +221,20 @@ sub get_login_request {
 sub get_request_frame {
     my ($self) = @_;
 
-    my $object  = $self->param('object');
-    my $command = $self->param('command');
+    my $command = $self->param('command');  # f.ex. create/update
+    my $object  = $self->param('object');   # f.ex. host/domain/poll
 
-    my $frame_name = 'Net::EPP::Frame::Command::' . ucfirst($command) . '::' . ucfirst($object);
-    if($object eq 'poll') {
-        if($command eq 'req') {
-            $frame_name = 'Net::EPP::Frame::Command::Poll::Req';
-        } else {
-            $frame_name = 'Net::EPP::Frame::Command::Poll::Ack';
-        }
+    my $cmd = ucfirst($command) . '::' . ucfirst($object);
+    # For poll the object and command order is reversed
+    if ( $object eq 'poll' ) {
+        $cmd = ucfirst($object) . '::' . ucfirst($command);
     }
 
-    my $frame = $frame_name->new;
+    my $frame_name = 'Net::EPP::Frame::Command::' . $cmd;
 
-    $self->app->log->info("Frame is $frame_name : $frame");
+    $self->app->log->info("get_request_frame $object / $command => $cmd  => $frame_name");
+
+    my $frame = $frame_name->new;
 
     my $domain = $self->param('domain');
     if ( $domain ) {
@@ -243,7 +242,7 @@ sub get_request_frame {
         $self->set_if_can($frame, 'addDomain', $domain);
     }
 
-    if($object eq 'domain' && $command eq 'renew') {
+    if ( $cmd eq 'Domain::Renew' ) {
         my $period = $self->param('period');
         my $expire_date = $self->param('curExpDate');
         $frame->setCurExpDate($expire_date);
@@ -420,11 +419,11 @@ sub get_request_frame {
         $self->session(requestedNsAdmin => $requestedNsAdmin);
     }
 
-    if($object eq 'poll' and $command eq 'ack') {
+    if( $cmd eq 'Poll::Ack') {
         $frame->setMsgID($self->param('msgID'));
     }
 
-    if($object eq 'contact' and $command eq 'create') {
+    if( $cmd eq 'Create::Contact' ) {
         $frame->setContact( $self->param('contact.userid') // 'auto' );
     }
 
@@ -463,8 +462,6 @@ sub get_request_frame {
             $frame->setVoice($self->param('contact.voice')) if $self->param('contact.voice');
             $frame->setFax($self->param('contact.fax')) if $self->param('contact.fax');
             $frame->setEmail($self->param('contact.email')) if $self->param('contact.email');
-
-            $frame->setAuthInfo;
 
             $frame->getNode('command')->appendChild($extension);
 
@@ -563,19 +560,6 @@ sub get_request_frame {
     my $change_registrant = $self->param('change_registrant');
     if($change_registrant) {
         $frame->chgRegistrant( $change_registrant );
-    }
-
-    my $authinfo_type = $self->param('authinfo_type');
-    my $authinfo_pw = $self->param('authinfo_pw');
-    if ( $authinfo_type && $authinfo_type =~ /^(generate|clear|use)$/ ) {
-        my %map = (
-            generate => 'auto',
-            clear    => '',
-            # Perhaps add alternative clear option where authInfoChgType element <domain:null/> is passed instead of <domain:pw/>
-            use      => $authinfo_pw,
-        );
-        $authinfo_pw = $map{ $authinfo_type };
-        $self->set_if_can($frame, 'chgAuthInfo', $authinfo_pw );
     }
 
     my $remove_all   = $self->param('rem_all_dsrecords');
@@ -687,6 +671,23 @@ sub get_request_frame {
 
     }
 
+    my $authinfo_type = $self->param('authinfo_type');
+    my $authinfo_pw   = $self->param('authinfo_pw');
+    if ( defined $authinfo_type ) {
+        my %map = (
+            generate => 'auto',
+            clear    => '',
+            # Perhaps add alternative clear option where authInfoChgType element <domain:null/> is passed instead of <domain:pw/>
+            use      => $authinfo_pw,
+        );
+        $authinfo_pw = $map{ $authinfo_type };
+    }
+    if ( defined $authinfo_pw ) {
+        $self->set_if_can($frame, 'chgAuthInfo', $authinfo_pw );
+        $self->set_if_can($frame, 'setAuthInfo', $authinfo_pw );
+        $self->session(authinfo_pw => $authinfo_pw);
+    }
+
     foreach my $xmlns_name (qw(xmlns.secDNS xmlns.dkhm)){
         next unless @{ $self->every_param($xmlns_name) };
         my $ns = $self->param($xmlns_name);
@@ -699,6 +700,8 @@ sub get_request_frame {
     my $transactionid = $frame->createElement('clTRID');
     $transactionid->appendText( md5_hex(Time::HiRes::time().$$) );
     $frame->getNode('command')->appendChild($transactionid);
+
+    $self->app->log->info("Frame is $frame_name : $frame");
 
     return $frame;
 }

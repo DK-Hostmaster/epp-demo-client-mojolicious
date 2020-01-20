@@ -17,7 +17,7 @@
                 <option value="clear">Clear</option>
                 <option value="use">Use ==&gt;</option>
             </select>
-            <input type="text" class="form-control" placeholder="Authinfo token" name="authinfo_pw">
+            <input type="text" class="form-control" placeholder="Authinfo token" name="authinfo_pw" value="<%= session('authinfo_pw') %>">
         </div>
     </div>
 </div>
