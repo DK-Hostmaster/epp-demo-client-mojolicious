@@ -57,21 +57,22 @@ sub startup {
         )
     );
 
-    $self->helper(set_if_can            => \&set_if_can);
-    $self->helper(get_login_request     => \&get_login_request);
-    $self->helper(get_request_frame     => \&get_request_frame);
-    $self->helper(get_logout_request    => \&get_logout_request );
-    $self->helper(epp_client            => \&epp_client );
-    $self->helper(pretty_print          => \&pretty_print);
-    $self->helper(xml_tag               => \&_xml_tag );
-    $self->helper(extension_element     => \&_extension_element );
-    $self->helper(add_extension_element => \&_add_extension_element );
-    $self->helper(parse_reply           => \&parse_reply);
-    $self->helper(commands_from_object  => \&commands_from_object);
-    $self->helper(namespace             => \&namespace);
-    $self->helper(elements              => \&_elements);
-    $self->helper(text_elements         => \&_text_elements);
-    $self->helper(text_element_into     => \&_text_element_into);
+    $self->helper(set_if_can             => \&set_if_can);
+    $self->helper(get_login_request      => \&get_login_request);
+    $self->helper(get_request_frame      => \&get_request_frame);
+    $self->helper(get_logout_request     => \&get_logout_request );
+    $self->helper(epp_client             => \&epp_client );
+    $self->helper(pretty_print           => \&pretty_print);
+    $self->helper(xml_tag                => \&_xml_tag );
+    $self->helper(extension_element      => \&_extension_element );
+    $self->helper(add_extension_element  => \&_add_extension_element );
+    $self->helper(parse_reply            => \&parse_reply);
+    $self->helper(commands_from_object   => \&commands_from_object);
+    $self->helper(namespace              => \&namespace);
+    $self->helper(elements               => \&_elements);
+    $self->helper(text_elements          => \&_text_elements);
+    $self->helper(text_element_into      => \&_text_element_into);
+    $self->helper(generic_param_to_frame => \&_generic_param_to_frame);
 
     # Normal route to controller
     $r->get('/')->to('client#index');
@@ -252,31 +253,23 @@ sub get_request_frame {
 
     my $frame = $frame_name->new;
 
-    my $domain = $self->param('domain');
-    if ( $domain ) {
-        $self->set_if_can($frame, 'setDomain', $domain);
-        $self->set_if_can($frame, 'addDomain', $domain);
-    }
-
-    if ( $cmd eq 'Domain::Renew' ) {
-        my $period = $self->param('period');
-        my $expire_date = $self->param('curExpDate');
-        $frame->setCurExpDate($expire_date);
-        $frame->setPeriod($period);
-        $self->session(period => $period);
-        $self->session(curExpDate => $expire_date);
-    }
+    #
+    # Generic transfer
+    # f.ex. param('domain')
+    # into $frame->setDomain($value) or $frame->addDomain($value) [if frame has method],
+    # also sets session('domain' => $value)
+    #
+    $self->generic_param_to_frame('domain',               $frame, 'setDomain', 'addDomain');
+    $self->generic_param_to_frame('period',               $frame, 'setPeriod');
+    $self->generic_param_to_frame('curExpDate',           $frame, 'setCurExpDate');
+    $self->generic_param_to_frame('host',                 $frame, 'setHost', 'addHost');
+    $self->generic_param_to_frame('new_host',             $frame, 'chgName');
+    $self->generic_param_to_frame('userid',               $frame, 'setContact', 'addContact');
+    $self->generic_param_to_frame('change_registrant',    $frame, 'chgRegistrant');
+    $self->generic_param_to_frame('msgID',                $frame, 'setMsgID');
 
     my($domain_create_el) = $frame->getElementsByTagName('domain:create');
     if( $domain_create_el ) {
-        my $period = $self->param('period');
-        if ($period) {
-            my $el = $frame->createElement('domain:period');
-            $el->appendText($period);
-            $el->setAttribute( 'unit', 'y' );
-            $domain_create_el->appendChild($el);
-        }
-
         my $nameserver_names     = $self->every_param('new_nameserver_name');
         my $nameserver_el = $frame->createElement('domain:ns');
         foreach my $nameserver_name ( @$nameserver_names ) {
@@ -357,30 +350,10 @@ sub get_request_frame {
             $extension->appendChild($token_el);
         }
         $self->session(
-            period     => $period,
             registrant => $registrant,
         );
     }
 
-    my $host = $self->param('host');
-    if ( $host ) {
-        $self->set_if_can($frame, 'addHost', $host);
-        $self->set_if_can($frame, 'setHost', $host);
-        $self->session(host => $host);
-    }
-
-    my $new_host = $self->param('new_host');
-    if ( $new_host ) {
-        $self->set_if_can($frame, 'chgName', $new_host);
-        $self->session(new_host => $new_host);
-    }
-
-    my $userid = $self->param('userid');
-    if($userid) {
-        $self->set_if_can($frame, 'addContact', $userid);
-        $self->set_if_can($frame, 'setContact', $userid);
-        $self->session(userid => $userid);
-    }
 
     my $addrs = $self->every_param('addr');
     foreach my $addr (@${addrs}) {
@@ -426,13 +399,6 @@ sub get_request_frame {
         $self->session(requestedNsAdmin => $requestedNsAdmin);
     }
 
-    if( $cmd eq 'Poll::Ack') {
-        $frame->setMsgID($self->param('msgID'));
-    }
-
-    if( $cmd eq 'Create::Contact' ) {
-        $frame->setContact( $self->param('contact.userid') // 'auto' );
-    }
 
     if($object eq 'contact') {
         my $addr = {
@@ -485,10 +451,6 @@ sub get_request_frame {
                 $frame->getNode('contact:postalInfo')->removeChild($namenode);
             }
 
-            my $new_password = $self->param('contact.new_password');
-            if ( $new_password ) {
-                $self->set_if_can($frame, 'chgAuthInfo', $new_password);
-            }
 
             #FIXME: Replace 3 if statements below with the 3 lines below
             # when and if patch sent to Net::EPP is accepted.
@@ -558,10 +520,6 @@ sub get_request_frame {
         );
     }
 
-    my $change_registrant = $self->param('change_registrant');
-    if($change_registrant) {
-        $frame->chgRegistrant( $change_registrant );
-    }
 
     my $remove_all   = $self->param('rem_all_dsrecords');
     if ( $remove_all ) {
@@ -668,6 +626,10 @@ sub get_request_frame {
 
     }
 
+    if( $cmd eq 'Create::Contact' ) {
+        $frame->setContact( $self->param('contact.userid') // 'auto' );
+    }
+
     my $authinfo_type = $self->param('authinfo_type');
     my $authinfo_pw   = $self->param('authinfo_pw');
     if ( defined $authinfo_type ) {
@@ -684,6 +646,7 @@ sub get_request_frame {
         $self->set_if_can($frame, 'setAuthInfo', $authinfo_pw );
         $self->session(authinfo_pw => $authinfo_pw);
     }
+    $self->generic_param_to_frame('contact.new_password', $frame, 'chgAuthInfo');   # Also see param authinfo_pw, above
 
     # Delete date for domain delete
     if ( my $del_date = $self->param('delDate') ) {
@@ -969,6 +932,20 @@ sub namespace {
     my $name = "xmlns.${short}";
     my $ns = $self->param($name) || $self->session($name);
     return( $ns, $short );
+}
+
+# Generic transfer f.ex. param('domain') into $frame->setDomain($value) or $frame->addDomain($value) [if frame has method], also sets session('domain' => $value)
+sub _generic_param_to_frame {
+    my($self, $param_name, $frame, @set_functions) = @_;
+    my $values = $self->every_param($param_name);
+    foreach my $value ( @$values ) {
+        next unless $value;
+        foreach my $method ( @set_functions ) {
+            $self->set_if_can($frame, $method, $value);
+        }
+        # Store only last value in session. Can we handle @$values in session instead ?
+        $self->session($param_name => $value);
+    }
 }
 
 1;
