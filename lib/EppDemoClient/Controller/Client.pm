@@ -118,8 +118,14 @@ sub _perform_login {
 
     $self->app->log->info("Connecting to $hostname:$port");
 
+    my $epp;
+    try {
     # Notice. This may fail if connection cannot be established. This returns invalid XML. TODO: FIX.
-    my $epp = $self->epp_client($hostname, $port);
+        $epp = $self->epp_client($hostname, $port);
+    } catch ($err) {
+        $self->app->log->error(sprintf('Connection to epp_client host %s port %s failed: %s', $hostname, $port, $err));
+        return { code => 2500 };
+    }
 
     my $greeting = $epp->connect(
         SSL_version         => 'TLSv12',

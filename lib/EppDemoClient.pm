@@ -6,18 +6,19 @@ use Net::EPP::Frame::ObjectSpec;
 use Net::EPP::Frame::Command;
 use Net::EPP::Frame::Command::Login;
 use Net::EPP::Frame::Command::Logout;
-use Net::EPP::Frame::Command::Check::Host;
-use Net::EPP::Frame::Command::Create::Host;
-use Net::EPP::Frame::Command::Delete::Host;
-use Net::EPP::Frame::Command::Info::Host;
-use Net::EPP::Frame::Command::Update::Host;
 use Net::EPP::Frame::Command::Check::Domain;
+use Net::EPP::Frame::Command::Check::Host;
 use Net::EPP::Frame::Command::Create::Domain;
+use Net::EPP::Frame::Command::Create::Host;
+use Net::EPP::Frame::Command::Delete::Domain;
+use Net::EPP::Frame::Command::Delete::Host;
 use Net::EPP::Frame::Command::Info::Domain;
+use Net::EPP::Frame::Command::Info::Host;
 use Net::EPP::Frame::Command::Renew::Domain;
 use Net::EPP::Frame::Command::Update::Domain;
-use Net::EPP::Frame::Command::Poll::Req;
+use Net::EPP::Frame::Command::Update::Host;
 use Net::EPP::Frame::Command::Poll::Ack;
+use Net::EPP::Frame::Command::Poll::Req;
 
 use Net::IP;
 use Time::HiRes;
@@ -63,6 +64,7 @@ sub startup {
     $self->helper(epp_client            => \&epp_client );
     $self->helper(pretty_print          => \&pretty_print);
     $self->helper(xml_tag               => \&_xml_tag );
+    $self->helper(extension_element     => \&_extension_element );
     $self->helper(add_extension_element => \&_add_extension_element );
     $self->helper(parse_reply           => \&parse_reply);
     $self->helper(commands_from_object  => \&commands_from_object);
@@ -134,8 +136,22 @@ sub _text_element_into {
     }
 }
 
+sub _extension_element {
+    my($self, $xml_frame) = @_;
+
+    my $extension_element = $xml_frame->getNode('extension');
+    if ( ! $extension_element ) {
+         $extension_element = $xml_frame->createElement('extension');
+         $xml_frame->getNode('command')->appendChild($extension_element);
+    }
+
+    return $extension_element;
+}
+
 sub _add_extension_element {
     my($self, $xml_frame, $element_name, $value, $extension_element) = @_;
+
+    $extension_element //= $self->extension_element($xml_frame);
 
     if($value) {
         my $element = $xml_frame->createElement($element_name);
@@ -303,11 +319,7 @@ sub get_request_frame {
             my $digest       = shift @{$digests};
             next unless $keytag || $algorithm || $digest_type || $digest;
 
-            my $extension = $frame->getNode('extension');
-            if ( ! $extension ) {
-                $extension = $frame->createElement('extension');
-                $frame->getNode('command')->appendChild($extension);
-            }
+            my $extension = $self->extension_element($frame);
 
             my $create = $frame->getNode('secDNS:create');
             if ( ! $create ) {
@@ -338,11 +350,7 @@ sub get_request_frame {
         }
         my $orderconfirmationtoken = $self->param('orderconfirmationtoken');
         if ($orderconfirmationtoken) {
-            my $extension = $frame->getNode('extension');
-            if ( ! $extension ) {
-                $extension = $frame->createElement('extension');
-                $frame->getNode('command')->appendChild($extension);
-            }
+            my $extension = $self->extension_element($frame);
             my $token_el = $frame->createElement('dkhm:orderconfirmationToken');
             $token_el->setNamespace( $self->namespace('dkhm') );
             $token_el->appendText($orderconfirmationtoken);
@@ -407,14 +415,13 @@ sub get_request_frame {
     my $requestedNsAdmin = $self->param('requestedNsAdmin');
     if($requestedNsAdmin) {
 
-        my $extension = $frame->createElement('extension');
+        my $extension = $self->extension_element($frame);
 
         my $nsa_element = $frame->createElement('dkhm:requestedNsAdmin');
         $nsa_element->setNamespace( $self->namespace('dkhm') );
         $nsa_element->appendText($requestedNsAdmin);
 
         $extension->appendChild($nsa_element);
-        $frame->getNode('command')->appendChild($extension);
 
         $self->session(requestedNsAdmin => $requestedNsAdmin);
     }
@@ -438,7 +445,7 @@ sub get_request_frame {
         if ($command eq 'create') {
             $frame->addPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
 
-            my $extension = $frame->createElement('extension');
+            my $extension = $self->extension_element($frame);
 
             my $user_type_element = $frame->createElement('dkhm:userType');
             $user_type_element->setNamespace( $self->namespace('dkhm') );
@@ -462,8 +469,6 @@ sub get_request_frame {
             $frame->setVoice($self->param('contact.voice')) if $self->param('contact.voice');
             $frame->setFax($self->param('contact.fax')) if $self->param('contact.fax');
             $frame->setEmail($self->param('contact.email')) if $self->param('contact.email');
-
-            $frame->getNode('command')->appendChild($extension);
 
         } elsif ($command eq 'update') {
 
@@ -519,16 +524,12 @@ sub get_request_frame {
             my $usertype = $self->param('contact.usertype');
             my $ean = $self->param('contact.ean');
             if($email2 || $mobilephone || $cvr || $pnumber || $usertype || $ean) {
-                my $extension = $frame->createElement('extension');
-
-                $self->add_extension_element($frame, 'dkhm:pnumber', $pnumber, $extension);
-                $self->add_extension_element($frame, 'dkhm:CVR', $cvr, $extension);
-                $self->add_extension_element($frame, 'dkhm:mobilephone', $mobilephone, $extension);
-                $self->add_extension_element($frame, 'dkhm:secondaryEmail', $email2, $extension);
-                $self->add_extension_element($frame, 'dkhm:EAN', $ean, $extension);
-                $self->add_extension_element($frame, 'dkhm:userType', $usertype, $extension);
-
-                $frame->getNode('command')->appendChild($extension);
+                $self->add_extension_element($frame, 'dkhm:pnumber', $pnumber);
+                $self->add_extension_element($frame, 'dkhm:CVR', $cvr);
+                $self->add_extension_element($frame, 'dkhm:mobilephone', $mobilephone);
+                $self->add_extension_element($frame, 'dkhm:secondaryEmail', $email2);
+                $self->add_extension_element($frame, 'dkhm:EAN', $ean);
+                $self->add_extension_element($frame, 'dkhm:userType', $usertype);
             }
 
         }
@@ -583,11 +584,7 @@ sub get_request_frame {
             my $digest       = shift @$digests;
             next unless $keytag || $algorithm || $digest_type || $digest;
 
-            my $extension = $frame->getNode('extension');
-            if ( ! $extension ) {
-                $extension = $frame->createElement('extension');
-                $frame->getNode('command')->appendChild($extension);
-            }
+            my $extension = $self->extension_element($frame);
 
             my $update = $frame->getNode('secDNS:update');
             if ( ! $update ) {
@@ -686,6 +683,12 @@ sub get_request_frame {
         $self->set_if_can($frame, 'chgAuthInfo', $authinfo_pw );
         $self->set_if_can($frame, 'setAuthInfo', $authinfo_pw );
         $self->session(authinfo_pw => $authinfo_pw);
+    }
+
+    # Delete date for domain delete
+    if ( my $del_date = $self->param('delDate') ) {
+        $self->add_extension_element($frame, 'dkhm:delDate', $del_date);
+        $self->session(delDate => $del_date);
     }
 
     foreach my $xmlns_name (qw(xmlns.secDNS xmlns.dkhm)){
@@ -948,7 +951,7 @@ sub commands_from_object {
     if ($object eq 'host') {
         @values = ['check', 'create', 'delete', 'info', 'update'];
     } elsif ($object eq 'domain') {
-        @values = ['check', 'create', 'info', 'renew', 'update'];
+        @values = ['check', 'create', 'delete', 'info', 'renew', 'update'];
     } elsif ($object eq 'contact') {
         @values = ['check', 'create', 'info', 'update'];
     } elsif ($object eq 'poll') {
