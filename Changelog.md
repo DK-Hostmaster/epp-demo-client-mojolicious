@@ -1,5 +1,13 @@
 # Changelog for EPP Demo Client
 
+## 1.2.0 2020-01-27 Feature release, Update recommended
+
+- Added support for AuthInfo, please see our RFC: https://github.com/DK-Hostmaster/DKHM-RFC-AuthInfo
+
+- Added support for XSD handling
+
+- Fixed some minor issues (most introduced with the above feature changes)
+
 ## 1.1.0 2019-01-22 Feature release, Update recommended
 
 - Added support for DNSSEC extension, issue #25
