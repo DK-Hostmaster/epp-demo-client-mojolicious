@@ -222,8 +222,8 @@
                         </div>
 
                         <div id="command_form">
-                            % if ($object and $command) {
-                            <%= include "commands/$object/$command" %>
+                            % if ($object and $command and $object =~ /\A\w+\z/ && $command =~ /^\w+\z/ ) {
+                                %= include "commands/$object/$command"
                             % }
                         </div>
 

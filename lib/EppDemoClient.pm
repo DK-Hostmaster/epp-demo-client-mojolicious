@@ -6,18 +6,19 @@ use Net::EPP::Frame::ObjectSpec;
 use Net::EPP::Frame::Command;
 use Net::EPP::Frame::Command::Login;
 use Net::EPP::Frame::Command::Logout;
-use Net::EPP::Frame::Command::Check::Host;
-use Net::EPP::Frame::Command::Create::Host;
-use Net::EPP::Frame::Command::Delete::Host;
-use Net::EPP::Frame::Command::Info::Host;
-use Net::EPP::Frame::Command::Update::Host;
 use Net::EPP::Frame::Command::Check::Domain;
+use Net::EPP::Frame::Command::Check::Host;
 use Net::EPP::Frame::Command::Create::Domain;
+use Net::EPP::Frame::Command::Create::Host;
+use Net::EPP::Frame::Command::Delete::Domain;
+use Net::EPP::Frame::Command::Delete::Host;
 use Net::EPP::Frame::Command::Info::Domain;
+use Net::EPP::Frame::Command::Info::Host;
 use Net::EPP::Frame::Command::Renew::Domain;
 use Net::EPP::Frame::Command::Update::Domain;
-use Net::EPP::Frame::Command::Poll::Req;
+use Net::EPP::Frame::Command::Update::Host;
 use Net::EPP::Frame::Command::Poll::Ack;
+use Net::EPP::Frame::Command::Poll::Req;
 
 use Net::IP;
 use Time::HiRes;
@@ -56,20 +57,22 @@ sub startup {
         )
     );
 
-    $self->helper(set_if_can            => \&set_if_can);
-    $self->helper(get_login_request     => \&get_login_request);
-    $self->helper(get_request_frame     => \&get_request_frame);
-    $self->helper(get_logout_request    => \&get_logout_request );
-    $self->helper(epp_client            => \&epp_client );
-    $self->helper(pretty_print          => \&pretty_print);
-    $self->helper(xml_tag               => \&_xml_tag );
-    $self->helper(add_extension_element => \&_add_extension_element );
-    $self->helper(parse_reply           => \&parse_reply);
-    $self->helper(commands_from_object  => \&commands_from_object);
-    $self->helper(namespace             => \&namespace);
-    $self->helper(elements              => \&_elements);
-    $self->helper(text_elements         => \&_text_elements);
-    $self->helper(text_element_into     => \&_text_element_into);
+    $self->helper(set_if_can             => \&set_if_can);
+    $self->helper(get_login_request      => \&get_login_request);
+    $self->helper(get_request_frame      => \&get_request_frame);
+    $self->helper(get_logout_request     => \&get_logout_request );
+    $self->helper(epp_client             => \&epp_client );
+    $self->helper(pretty_print           => \&pretty_print);
+    $self->helper(xml_tag                => \&_xml_tag );
+    $self->helper(extension_element      => \&_extension_element );
+    $self->helper(add_extension_element  => \&_add_extension_element );
+    $self->helper(parse_reply            => \&parse_reply);
+    $self->helper(commands_from_object   => \&commands_from_object);
+    $self->helper(namespace              => \&namespace);
+    $self->helper(elements               => \&_elements);
+    $self->helper(text_elements          => \&_text_elements);
+    $self->helper(text_element_into      => \&_text_element_into);
+    $self->helper(generic_param_to_frame => \&_generic_param_to_frame);
 
     # Normal route to controller
     $r->get('/')->to('client#index');
@@ -134,8 +137,22 @@ sub _text_element_into {
     }
 }
 
+sub _extension_element {
+    my($self, $xml_frame) = @_;
+
+    my $extension_element = $xml_frame->getNode('extension');
+    if ( ! $extension_element ) {
+         $extension_element = $xml_frame->createElement('extension');
+         $xml_frame->getNode('command')->appendChild($extension_element);
+    }
+
+    return $extension_element;
+}
+
 sub _add_extension_element {
     my($self, $xml_frame, $element_name, $value, $extension_element) = @_;
+
+    $extension_element //= $self->extension_element($xml_frame);
 
     if($value) {
         my $element = $xml_frame->createElement($element_name);
@@ -236,31 +253,23 @@ sub get_request_frame {
 
     my $frame = $frame_name->new;
 
-    my $domain = $self->param('domain');
-    if ( $domain ) {
-        $self->set_if_can($frame, 'setDomain', $domain);
-        $self->set_if_can($frame, 'addDomain', $domain);
-    }
-
-    if ( $cmd eq 'Domain::Renew' ) {
-        my $period = $self->param('period');
-        my $expire_date = $self->param('curExpDate');
-        $frame->setCurExpDate($expire_date);
-        $frame->setPeriod($period);
-        $self->session(period => $period);
-        $self->session(curExpDate => $expire_date);
-    }
+    #
+    # Generic transfer
+    # f.ex. param('domain')
+    # into $frame->setDomain($value) or $frame->addDomain($value) [if frame has method],
+    # also sets session('domain' => $value)
+    #
+    $self->generic_param_to_frame('domain',               $frame, 'setDomain', 'addDomain');
+    $self->generic_param_to_frame('period',               $frame, 'setPeriod');
+    $self->generic_param_to_frame('curExpDate',           $frame, 'setCurExpDate');
+    $self->generic_param_to_frame('host',                 $frame, 'setHost', 'addHost');
+    $self->generic_param_to_frame('new_host',             $frame, 'chgName');
+    $self->generic_param_to_frame('userid',               $frame, 'setContact', 'addContact');
+    $self->generic_param_to_frame('change_registrant',    $frame, 'chgRegistrant');
+    $self->generic_param_to_frame('msgID',                $frame, 'setMsgID');
 
     my($domain_create_el) = $frame->getElementsByTagName('domain:create');
     if( $domain_create_el ) {
-        my $period = $self->param('period');
-        if ($period) {
-            my $el = $frame->createElement('domain:period');
-            $el->appendText($period);
-            $el->setAttribute( 'unit', 'y' );
-            $domain_create_el->appendChild($el);
-        }
-
         my $nameserver_names     = $self->every_param('new_nameserver_name');
         my $nameserver_el = $frame->createElement('domain:ns');
         foreach my $nameserver_name ( @$nameserver_names ) {
@@ -303,11 +312,7 @@ sub get_request_frame {
             my $digest       = shift @{$digests};
             next unless $keytag || $algorithm || $digest_type || $digest;
 
-            my $extension = $frame->getNode('extension');
-            if ( ! $extension ) {
-                $extension = $frame->createElement('extension');
-                $frame->getNode('command')->appendChild($extension);
-            }
+            my $extension = $self->extension_element($frame);
 
             my $create = $frame->getNode('secDNS:create');
             if ( ! $create ) {
@@ -338,41 +343,17 @@ sub get_request_frame {
         }
         my $orderconfirmationtoken = $self->param('orderconfirmationtoken');
         if ($orderconfirmationtoken) {
-            my $extension = $frame->getNode('extension');
-            if ( ! $extension ) {
-                $extension = $frame->createElement('extension');
-                $frame->getNode('command')->appendChild($extension);
-            }
+            my $extension = $self->extension_element($frame);
             my $token_el = $frame->createElement('dkhm:orderconfirmationToken');
             $token_el->setNamespace( $self->namespace('dkhm') );
             $token_el->appendText($orderconfirmationtoken);
             $extension->appendChild($token_el);
         }
         $self->session(
-            period     => $period,
             registrant => $registrant,
         );
     }
 
-    my $host = $self->param('host');
-    if ( $host ) {
-        $self->set_if_can($frame, 'addHost', $host);
-        $self->set_if_can($frame, 'setHost', $host);
-        $self->session(host => $host);
-    }
-
-    my $new_host = $self->param('new_host');
-    if ( $new_host ) {
-        $self->set_if_can($frame, 'chgName', $new_host);
-        $self->session(new_host => $new_host);
-    }
-
-    my $userid = $self->param('userid');
-    if($userid) {
-        $self->set_if_can($frame, 'addContact', $userid);
-        $self->set_if_can($frame, 'setContact', $userid);
-        $self->session(userid => $userid);
-    }
 
     my $addrs = $self->every_param('addr');
     foreach my $addr (@${addrs}) {
@@ -407,25 +388,17 @@ sub get_request_frame {
     my $requestedNsAdmin = $self->param('requestedNsAdmin');
     if($requestedNsAdmin) {
 
-        my $extension = $frame->createElement('extension');
+        my $extension = $self->extension_element($frame);
 
         my $nsa_element = $frame->createElement('dkhm:requestedNsAdmin');
         $nsa_element->setNamespace( $self->namespace('dkhm') );
         $nsa_element->appendText($requestedNsAdmin);
 
         $extension->appendChild($nsa_element);
-        $frame->getNode('command')->appendChild($extension);
 
         $self->session(requestedNsAdmin => $requestedNsAdmin);
     }
 
-    if( $cmd eq 'Poll::Ack') {
-        $frame->setMsgID($self->param('msgID'));
-    }
-
-    if( $cmd eq 'Create::Contact' ) {
-        $frame->setContact( $self->param('contact.userid') // 'auto' );
-    }
 
     if($object eq 'contact') {
         my $addr = {
@@ -438,7 +411,7 @@ sub get_request_frame {
         if ($command eq 'create') {
             $frame->addPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
 
-            my $extension = $frame->createElement('extension');
+            my $extension = $self->extension_element($frame);
 
             my $user_type_element = $frame->createElement('dkhm:userType');
             $user_type_element->setNamespace( $self->namespace('dkhm') );
@@ -463,8 +436,6 @@ sub get_request_frame {
             $frame->setFax($self->param('contact.fax')) if $self->param('contact.fax');
             $frame->setEmail($self->param('contact.email')) if $self->param('contact.email');
 
-            $frame->getNode('command')->appendChild($extension);
-
         } elsif ($command eq 'update') {
 
             if($addr->{street}[0]) {
@@ -480,10 +451,6 @@ sub get_request_frame {
                 $frame->getNode('contact:postalInfo')->removeChild($namenode);
             }
 
-            my $new_password = $self->param('contact.new_password');
-            if ( $new_password ) {
-                $self->set_if_can($frame, 'chgAuthInfo', $new_password);
-            }
 
             #FIXME: Replace 3 if statements below with the 3 lines below
             # when and if patch sent to Net::EPP is accepted.
@@ -519,16 +486,12 @@ sub get_request_frame {
             my $usertype = $self->param('contact.usertype');
             my $ean = $self->param('contact.ean');
             if($email2 || $mobilephone || $cvr || $pnumber || $usertype || $ean) {
-                my $extension = $frame->createElement('extension');
-
-                $self->add_extension_element($frame, 'dkhm:pnumber', $pnumber, $extension);
-                $self->add_extension_element($frame, 'dkhm:CVR', $cvr, $extension);
-                $self->add_extension_element($frame, 'dkhm:mobilephone', $mobilephone, $extension);
-                $self->add_extension_element($frame, 'dkhm:secondaryEmail', $email2, $extension);
-                $self->add_extension_element($frame, 'dkhm:EAN', $ean, $extension);
-                $self->add_extension_element($frame, 'dkhm:userType', $usertype, $extension);
-
-                $frame->getNode('command')->appendChild($extension);
+                $self->add_extension_element($frame, 'dkhm:pnumber', $pnumber);
+                $self->add_extension_element($frame, 'dkhm:CVR', $cvr);
+                $self->add_extension_element($frame, 'dkhm:mobilephone', $mobilephone);
+                $self->add_extension_element($frame, 'dkhm:secondaryEmail', $email2);
+                $self->add_extension_element($frame, 'dkhm:EAN', $ean);
+                $self->add_extension_element($frame, 'dkhm:userType', $usertype);
             }
 
         }
@@ -557,10 +520,6 @@ sub get_request_frame {
         );
     }
 
-    my $change_registrant = $self->param('change_registrant');
-    if($change_registrant) {
-        $frame->chgRegistrant( $change_registrant );
-    }
 
     my $remove_all   = $self->param('rem_all_dsrecords');
     if ( $remove_all ) {
@@ -583,11 +542,7 @@ sub get_request_frame {
             my $digest       = shift @$digests;
             next unless $keytag || $algorithm || $digest_type || $digest;
 
-            my $extension = $frame->getNode('extension');
-            if ( ! $extension ) {
-                $extension = $frame->createElement('extension');
-                $frame->getNode('command')->appendChild($extension);
-            }
+            my $extension = $self->extension_element($frame);
 
             my $update = $frame->getNode('secDNS:update');
             if ( ! $update ) {
@@ -671,6 +626,10 @@ sub get_request_frame {
 
     }
 
+    if( $cmd eq 'Create::Contact' ) {
+        $frame->setContact( $self->param('contact.userid') // 'auto' );
+    }
+
     my $authinfo_type = $self->param('authinfo_type');
     my $authinfo_pw   = $self->param('authinfo_pw');
     if ( defined $authinfo_type ) {
@@ -686,6 +645,13 @@ sub get_request_frame {
         $self->set_if_can($frame, 'chgAuthInfo', $authinfo_pw );
         $self->set_if_can($frame, 'setAuthInfo', $authinfo_pw );
         $self->session(authinfo_pw => $authinfo_pw);
+    }
+    $self->generic_param_to_frame('contact.new_password', $frame, 'chgAuthInfo');   # Also see param authinfo_pw, above
+
+    # Delete date for domain delete
+    if ( my $del_date = $self->param('delDate') ) {
+        $self->add_extension_element($frame, 'dkhm:delDate', $del_date);
+        $self->session(delDate => $del_date);
     }
 
     foreach my $xmlns_name (qw(xmlns.secDNS xmlns.dkhm)){
@@ -948,7 +914,7 @@ sub commands_from_object {
     if ($object eq 'host') {
         @values = ['check', 'create', 'delete', 'info', 'update'];
     } elsif ($object eq 'domain') {
-        @values = ['check', 'create', 'info', 'renew', 'update'];
+        @values = ['check', 'create', 'delete', 'info', 'renew', 'update'];
     } elsif ($object eq 'contact') {
         @values = ['check', 'create', 'info', 'update'];
     } elsif ($object eq 'poll') {
@@ -966,6 +932,20 @@ sub namespace {
     my $name = "xmlns.${short}";
     my $ns = $self->param($name) || $self->session($name);
     return( $ns, $short );
+}
+
+# Generic transfer f.ex. param('domain') into $frame->setDomain($value) or $frame->addDomain($value) [if frame has method], also sets session('domain' => $value)
+sub _generic_param_to_frame {
+    my($self, $param_name, $frame, @set_functions) = @_;
+    my $values = $self->every_param($param_name);
+    foreach my $value ( @$values ) {
+        next unless $value;
+        foreach my $method ( @set_functions ) {
+            $self->set_if_can($frame, $method, $value);
+        }
+        # Store only last value in session. Can we handle @$values in session instead ?
+        $self->session($param_name => $value);
+    }
 }
 
 1;
