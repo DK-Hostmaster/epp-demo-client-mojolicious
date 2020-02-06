@@ -38,6 +38,14 @@ function get_command_form(command) {
     });
 }
 
+function date_to_text( from, to ) {
+    if ( from.val() ) {
+        to.val( from.val() + "T00:00:00.0Z" );
+    } else {
+        to.val( "" );
+    }
+}
+
 $(document).ready(function(){
 
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {

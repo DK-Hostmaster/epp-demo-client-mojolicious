@@ -1,5 +1,9 @@
 # Changelog for EPP Demo Client
 
+## 1.3.0 2020-02-06 Feature release, Update recommended
+
+- Implementation of optional DKHM extension for delete domain command, PR #30
+
 ## 1.2.1 2020-02-06 Bug fix release, Update recommended
 
 - Implementation of handling of AuthInfo was too elaborate and broke create contact and mandatory requirement for AuthInfo, PR #29
