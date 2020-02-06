@@ -399,8 +399,12 @@ sub get_request_frame {
         $self->session(requestedNsAdmin => $requestedNsAdmin);
     }
 
+    if( $cmd eq 'Poll::Ack') {
+        $frame->setMsgID($self->param('msgID'));
+    }
 
     if($object eq 'contact') {
+
         my $addr = {
             street => $self->every_param('contact.street'),
             city   => $self->param('contact.city'),
@@ -409,6 +413,8 @@ sub get_request_frame {
         };
 
         if ($command eq 'create') {
+            $frame->setContact( $self->param('contact.userid') // 'auto' );
+
             $frame->addPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
 
             my $extension = $self->extension_element($frame);
@@ -437,6 +443,7 @@ sub get_request_frame {
             $frame->setEmail($self->param('contact.email')) if $self->param('contact.email');
 
         } elsif ($command eq 'update') {
+            $frame->setContact( $self->param('contact.userid') );
 
             if($addr->{street}[0]) {
                 $frame->chgPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
