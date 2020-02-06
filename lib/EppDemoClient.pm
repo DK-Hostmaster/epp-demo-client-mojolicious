@@ -423,11 +423,8 @@ sub get_request_frame {
         $frame->setMsgID($self->param('msgID'));
     }
 
-    if( $cmd eq 'Create::Contact' ) {
-        $frame->setContact( $self->param('contact.userid') // 'auto' );
-    }
-
     if($object eq 'contact') {
+
         my $addr = {
             street => $self->every_param('contact.street'),
             city   => $self->param('contact.city'),
@@ -436,6 +433,8 @@ sub get_request_frame {
         };
 
         if ($command eq 'create') {
+            $frame->setContact( $self->param('contact.userid') // 'auto' );
+
             $frame->addPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
 
             my $extension = $frame->createElement('extension');
@@ -466,6 +465,7 @@ sub get_request_frame {
             $frame->getNode('command')->appendChild($extension);
 
         } elsif ($command eq 'update') {
+            $frame->setContact( $self->param('contact.userid') );
 
             if($addr->{street}[0]) {
                 $frame->chgPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
