@@ -443,7 +443,7 @@ sub get_request_frame {
             $frame->setEmail($self->param('contact.email')) if $self->param('contact.email');
 
         } elsif ($command eq 'update') {
-            $frame->setContact( $self->param('contact.userid') );
+            # $frame->setContact( $self->param('contact.userid') );
 
             if($addr->{street}[0]) {
                 $frame->chgPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
