@@ -1,5 +1,9 @@
 # Changelog for EPP Demo Client
 
+## 1.2.1 2020-02-06 Bug fix release, Update recommended
+
+- Implementation of handling of AuthInfo was too elaborate and broke create contact and mandatory requirement for AuthInfo, PR #29
+
 ## 1.2.0 2020-01-27 Feature release, Update recommended
 
 - Added support for AuthInfo, please see our RFC: https://github.com/DK-Hostmaster/DKHM-RFC-AuthInfo
