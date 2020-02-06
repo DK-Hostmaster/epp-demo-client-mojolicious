@@ -633,10 +633,6 @@ sub get_request_frame {
 
     }
 
-    if( $cmd eq 'Create::Contact' ) {
-        $frame->setContact( $self->param('contact.userid') // 'auto' );
-    }
-
     my $authinfo_type = $self->param('authinfo_type');
     my $authinfo_pw   = $self->param('authinfo_pw');
     if ( defined $authinfo_type ) {
