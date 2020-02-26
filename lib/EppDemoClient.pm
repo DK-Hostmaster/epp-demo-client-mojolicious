@@ -289,8 +289,8 @@ sub get_request_frame {
     # also sets session('domain' => $value)
     #
     $self->generic_param_to_frame('domain',               $frame, 'setDomain', 'addDomain');
-    $self->generic_param_to_frame('period',               $frame, 'setPeriod');
     $self->generic_param_to_frame('curExpDate',           $frame, 'setCurExpDate');
+    $self->generic_param_to_frame('period',               $frame, 'setPeriod');
     $self->generic_param_to_frame('host',                 $frame, 'setHost', 'addHost');
     $self->generic_param_to_frame('new_host',             $frame, 'chgName');
     $self->generic_param_to_frame('userid',               $frame, 'setContact', 'addContact');
