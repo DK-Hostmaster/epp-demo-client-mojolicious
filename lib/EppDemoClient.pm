@@ -162,6 +162,35 @@ sub _add_extension_element {
     }
 }
 
+sub _add_ds_extension_element {
+    my($frame, $op, $urgent) = @_;
+
+    my $extension = $frame->getNode('extension');
+    if ( ! $extension ) {
+        $extension = $frame->createElement('extension');
+        $frame->getNode('command')->appendChild($extension);
+    }
+
+    my $update = $frame->getNode('secDNS:update');
+    if ( ! $update ) {
+        $update = $frame->createElement('update');
+        $update->setNamespace( 'urn:ietf:params:xml:ns:secDNS-1.1', 'secDNS' );
+
+        if ( $urgent ) {
+            $update->setAttribute( 'urgent' , 'true' );
+        }
+        $extension->appendChild($update);
+    }
+
+    my $op_element = $frame->getNode("secDNS:${op}");
+    if ( ! $op_element ) {
+        $op_element = $frame->createElement("secDNS:${op}");
+        $update->appendChild($op_element);
+    }
+
+    return $op_element;
+}
+
 # Central storage of connections to the EPP server. The connection id
 # is stored in session and EPP connections will live between browser
 # requests.
