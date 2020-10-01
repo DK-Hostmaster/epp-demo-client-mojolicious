@@ -1,7 +1,7 @@
 package EppDemoClient::Controller::Ajax;
 use Mojo::Base 'Mojolicious::Controller';
 
-use TryCatch;
+use Syntax::Keyword::Try;
 use Mojo::Util qw(xml_escape);
 use Digest::MD5 qw(md5_hex);
 use Time::HiRes;

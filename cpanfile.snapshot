@@ -2257,6 +2257,30 @@ DISTRIBUTIONS
       perl 5.006
       strict 0
       warnings 0
+  Syntax-Keyword-Try-0.18
+    pathname: P/PE/PEVANS/Syntax-Keyword-Try-0.18.tar.gz
+    provides:
+      Syntax::Keyword::Try 0.18
+    requirements:
+      ExtUtils::CBuilder 0
+      Module::Build 0.4004
+      perl 5.014
+  TAP-Formatter-JUnit-0.11
+    pathname: G/GT/GTERMARS/TAP-Formatter-JUnit-0.11.tar.gz
+    provides:
+      TAP::Formatter::JUnit 0.11
+      TAP::Formatter::JUnit::Result undef
+      TAP::Formatter::JUnit::Session undef
+    requirements:
+      File::Slurp 0
+      IO::Scalar 0
+      IPC::Run 0
+      Moose 0
+      MooseX::NonMoose 0
+      TAP::Harness 3.12
+      Test::More 0
+      Test::XML 0
+      XML::Generator 0
   Task-Weaken-1.06
     pathname: E/ET/ETHER/Task-Weaken-1.06.tar.gz
     provides:
@@ -2676,7 +2700,7 @@ DISTRIBUTIONS
   XSLoader-0.24
     pathname: S/SA/SAPER/XSLoader-0.24.tar.gz
     provides:
-      XSLoader undef
+      XSLoader 0.24
     requirements:
       ExtUtils::MakeMaker 0
       Test::More 0.47

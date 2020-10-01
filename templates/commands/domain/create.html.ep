@@ -62,3 +62,12 @@
         <input type="text" class="form-control" placeholder="Order confirmation token" name="orderconfirmationtoken" value="<%= session('orderconfirmationtoken') %>">
     </div>
 </div>
+
+<div class="form-group">
+    <label class="col-sm-3 control-label">Auto renew</label>
+    <div class="col-sm-9" id="command_select">
+        <input type="text" class="form-control" placeholder="true/false" name="auto_renew" value="<%= session('auto_renew') %>">
+        <button class="btn btn-primary" onclick="document.forms['execute_form']['auto_renew'].value = 'true'; return false;">True</button>
+        <button class="btn btn-primary" onclick="document.forms['execute_form']['auto_renew'].value = 'false'; return false;">False</button>
+    </div>
+</div>
