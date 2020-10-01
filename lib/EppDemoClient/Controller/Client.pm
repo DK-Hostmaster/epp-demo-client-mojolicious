@@ -2,11 +2,8 @@ package EppDemoClient::Controller::Client;
 use Mojo::Base 'Mojolicious::Controller';
 
 use Benchmark;
-
-use TryCatch;
-
+use Syntax::Keyword::Try;
 use Net::EPP::Frame::Hello;
-
 use Mojo::Util qw(xml_escape);
 use Digest::MD5 qw(md5_hex);
 use Time::HiRes;
@@ -25,9 +22,9 @@ sub index {
             try {
                 my $hello = Net::EPP::Frame::Hello->new;
 
-                $self->app->log->info("Sending hello command [" . $hello->toString . "]");
+                $self->app->log->info(sprintf('Sending hello command [%s]', $hello->toString));
                 my $answer = $epp->request($hello);
-                $self->app->log->info("Reply to hello command [" . $answer->toString . "]");
+                $self->app->log->info(sprintf('Reply to hello command [%s]', $answer->toString));
                 my $hello_reply = $self->parse_reply($answer);
                 $self->stash(logged_in => 1);
                 $self->stash(hello_reply => $answer->toString);
@@ -116,25 +113,25 @@ sub _perform_login {
 
     my $login_command = $self->get_login_request($username, $password);
 
-    $self->app->log->info("Connecting to $hostname:$port");
-
     my $epp;
     try {
-    # Notice. This may fail if connection cannot be established. This returns invalid XML. TODO: FIX.
+        $self->app->log->info("Connecting to $hostname:$port");
+        # Notice. This may fail if connection cannot be established. This returns invalid XML. TODO: FIX.
         $epp = $self->epp_client($hostname, $port);
+
+        $self->app->log->info("Sending login command [" . $login_command->toString . "]");
+
+        my $greeting = $epp->connect(
+            SSL_version         => 'TLSv12',
+            SSL_verify_mode     => 0,    # 0 = disable SSL verify,  3 = 1+2
+            SSL_use_cert        => 1,
+            SSL_verifycn_name   => $hostname,
+        );
+
     } catch ($err) {
         $self->app->log->error(sprintf('Connection to epp_client host %s port %s failed: %s', $hostname, $port, $err));
         return { code => 2500 };
     }
-
-    my $greeting = $epp->connect(
-        SSL_version         => 'TLSv12',
-        SSL_verify_mode     => 0,    # 0 = disable SSL verify,  3 = 1+2
-        SSL_use_cert        => 1,
-        SSL_verifycn_name   => $hostname,
-    );
-
-    $self->app->log->info("Sending login command [" . $login_command->toString . "]");
 
     my $answer = $epp->request($login_command);
 

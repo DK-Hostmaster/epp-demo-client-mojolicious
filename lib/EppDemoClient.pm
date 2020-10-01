@@ -24,7 +24,7 @@ use Net::IP;
 use Time::HiRes;
 use Digest::MD5 qw(md5_hex);
 use XML::Twig;
-use TryCatch;
+use Syntax::Keyword::Try;
 
 # This method will run once at server start
 sub startup {
@@ -445,33 +445,30 @@ sub get_request_frame {
             $frame->setContact( $self->param('contact.userid') // 'auto' );
 
             $frame->addPostalInfo('loc', $self->param('contact.name'), $self->param('contact.org'), $addr);
-
-            my $extension = $self->extension_element($frame);
-
-            my $user_type_element = $frame->createElement('dkhm:userType');
-            $user_type_element->setNamespace( $self->namespace('dkhm') );
-            $user_type_element->appendText($self->param('contact.usertype'));
-            $extension->appendChild($user_type_element);
-
-            if ($self->param('contact.cvr')) {
-                my $cvr_element = $frame->createElement('dkhm:CVR');
-                $cvr_element->setNamespace( $self->namespace('dkhm') );
-                $cvr_element->appendText($self->param('contact.cvr'));
-                $extension->appendChild($cvr_element);
+            if (my $voice = $self->param('contact.voice')) {
+                $frame->setVoice($voice);
+            }
+            if (my $fax = $self->param('contact.fax')) {
+                $frame->setFax($fax);
+            }
+            if (my $email = $self->param('contact.email') ) {
+                $frame->setEmail($email);
             }
 
-            if ($self->param('contact.pnumber')) {
-                my $pnr_element = $frame->createElement('dkhm:pnumber');
-                $pnr_element->setNamespace( $self->namespace('dkhm') );
-                $pnr_element->appendText($self->param('contact.pnumber'));
-                $extension->appendChild($pnr_element);
+            if (my $usertype = $self->param('contact.usertype')) {
+                $self->add_extension_element($frame, 'dkhm:userType', $usertype);
             }
 
-            $frame->setVoice($self->param('contact.voice')) if $self->param('contact.voice');
-            $frame->setFax($self->param('contact.fax')) if $self->param('contact.fax');
-            $frame->setEmail($self->param('contact.email')) if $self->param('contact.email');
+            if (my $cvr = $self->param('contact.cvr')) {
+                $self->add_extension_element($frame, 'dkhm:CVR', $cvr);
+            }
 
-        } elsif ($command eq 'update') {
+            if (my $pnumber = $self->param('contact.pnumber')) {
+                $self->add_extension_element($frame, 'dkhm:pnumber', $pnumber);
+            }
+
+        }
+        elsif ($command eq 'update') {
             # $frame->setContact( $self->param('contact.userid') );
 
             if($addr->{street}[0]) {
@@ -690,6 +687,12 @@ sub get_request_frame {
         next unless @{ $self->every_param($xmlns_name) };
         my $ns = $self->param($xmlns_name);
         $self->session($xmlns_name => $ns);
+    }
+
+    # create domain
+    if (my $auto_renew = $self->param('auto_renew')) {
+        $self->add_extension_element($frame, 'dkhm:autoRenew', $auto_renew);
+        $self->session(auto_renew => $auto_renew);
     }
 
     my $oldid = $frame->getNode('clTRID');
