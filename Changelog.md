@@ -16,7 +16,7 @@
 
 ## 1.3.0 2020-02-06 Feature release, Update recommended
 
-- Implementation of optional DKHM extension for delete domain command, PR #30
+- Implementation of optional DKHM extension for delete domain command for setting a deletion date, PR #30
 
 ## 1.2.1 2020-02-06 Bug fix release, Update recommended
 
