@@ -1,5 +1,19 @@
 # Changelog for EPP Demo Client
 
+## 1.4.0 2020-02-06 Feature release, Update recommended
+
+- Added support for the DKHM extension dkhm:autoRenew for create domain, PR #41
+
+## 1.3.2 2020-02-26 Bug fix release, Update recommended
+
+- Addressed issue #35 a method had disappeared
+
+- Addressed issue #34 reordering XML elements
+
+## 1.3.1 2020-02-06 Bug fix release, Update recommended
+
+- Bug fix release, addressing issues introduced in 1.2.X
+
 ## 1.3.0 2020-02-06 Feature release, Update recommended
 
 - Implementation of optional DKHM extension for delete domain command, PR #30
