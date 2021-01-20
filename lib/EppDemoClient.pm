@@ -19,6 +19,7 @@ use Net::EPP::Frame::Command::Update::Domain;
 use Net::EPP::Frame::Command::Update::Host;
 use Net::EPP::Frame::Command::Poll::Ack;
 use Net::EPP::Frame::Command::Poll::Req;
+use Net::EPP::Frame::Command::Withdraw::Domain;
 
 use Net::IP;
 use Time::HiRes;
@@ -949,7 +950,7 @@ sub commands_from_object {
     if ($object eq 'host') {
         @values = ['check', 'create', 'delete', 'info', 'update'];
     } elsif ($object eq 'domain') {
-        @values = ['check', 'create', 'delete', 'info', 'renew', 'update'];
+        @values = ['check', 'create', 'delete', 'info', 'renew', 'update', 'withdraw'];
     } elsif ($object eq 'contact') {
         @values = ['check', 'create', 'info', 'update'];
     } elsif ($object eq 'poll') {
