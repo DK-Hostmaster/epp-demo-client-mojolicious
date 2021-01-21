@@ -18,7 +18,7 @@ sub new {
     $command->setNamespace( commandNamespace );
     $command->unbindNode;
     $extelm->addChild($command);
-    $self->getNode('transfer');
+    #$self->getNode('transfer');
     #->setNodeName('withdraw');
     return $self;
 }
