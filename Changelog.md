@@ -1,5 +1,9 @@
 # Changelog for EPP Demo Client
 
+## 1.5.0 2021-01-25 Feature release, Update recommended
+
+- Added support for the DKHM extension dkhm:withdraw, PR #42
+
 ## 1.4.0 2020-02-06 Feature release, Update recommended
 
 - Added support for the DKHM extension dkhm:autoRenew for create domain, PR #41
