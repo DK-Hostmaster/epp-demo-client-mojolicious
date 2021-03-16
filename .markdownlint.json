@@ -1,3 +1,4 @@
 {
-    "no-bare-urls": false
+    "no-bare-urls": false,
+    "line-length": false
 }
