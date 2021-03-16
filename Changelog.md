@@ -4,6 +4,12 @@
 
 - Implementation of `dkhm:autoRenew` introduced in release 1.4.0 is too intrusive and was set with every command
 
+- Added missing entry for secDNS namespace version 1.0 in XSD drop-down
+
+- Added missing entry for DKHM namespace version 1.0 in XSD drop-down
+
+- Added entries for DKHM XSD versions 4.1 and 4.2 in XSD drop-down
+
 ## 1.5.0 2021-01-25 Feature release, Update recommended
 
 - Added support for the DKHM extension `dkhm:withdraw`, PR #42
