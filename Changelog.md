@@ -1,12 +1,16 @@
 # Changelog for EPP Demo Client
 
+## 1.5.1 2021-03-16 Bug fix release, Update recommended
+
+- Implementation of `dkhm:autoRenew` introduced in release 1.4.0 is too intrusive and was set with every command
+
 ## 1.5.0 2021-01-25 Feature release, Update recommended
 
-- Added support for the DKHM extension dkhm:withdraw, PR #42
+- Added support for the DKHM extension `dkhm:withdraw`, PR #42
 
 ## 1.4.0 2020-02-06 Feature release, Update recommended
 
-- Added support for the DKHM extension dkhm:autoRenew for create domain, PR #41
+- Added support for the DKHM extension `dkhm:autoRenew` for create domain, PR #41
 
 ## 1.3.2 2020-02-26 Bug fix release, Update recommended
 
