@@ -950,7 +950,7 @@ sub commands_from_object {
     if ($object eq 'host') {
         @values = ['check', 'create', 'delete', 'info', 'update'];
     } elsif ($object eq 'domain') {
-        @values = ['check', 'create', 'delete', 'info', 'renew', 'update', 'withdraw'];
+        @values = ['check', 'create', 'delete', 'info', 'renew', 'transfer', 'update', 'withdraw'];
     } elsif ($object eq 'contact') {
         @values = ['check', 'create', 'info', 'update'];
     } elsif ($object eq 'poll') {
