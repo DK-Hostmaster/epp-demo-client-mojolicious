@@ -5,7 +5,7 @@ use warnings;
 use base qw(Net::EPP::Frame::Command);
 
 sub commandNamespace { return ( 'urn:dkhm:params:xml:ns:dkhm-4.3' ); }
-sub withdrawNamespace { return ( commandNamespace, 'domain' ); }
+sub withdrawNamespace { return ( 'urn:dkhm:params:xml:ns:dkhm-domain-4.3', 'domain' ); }
 
 sub new {
 	my ($package, $type) = @_;
