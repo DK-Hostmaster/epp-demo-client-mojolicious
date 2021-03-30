@@ -17,6 +17,7 @@ use Net::EPP::Frame::Command::Info::Host;
 use Net::EPP::Frame::Command::Renew::Domain;
 use Net::EPP::Frame::Command::Update::Domain;
 use Net::EPP::Frame::Command::Update::Host;
+use Net::EPP::Frame::Command::Transfer::Domain;
 use Net::EPP::Frame::Command::Poll::Ack;
 use Net::EPP::Frame::Command::Poll::Req;
 use Net::EPP::Frame::Command::Withdraw::Domain;
