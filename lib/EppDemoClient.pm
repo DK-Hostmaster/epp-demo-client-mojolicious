@@ -434,6 +434,10 @@ sub get_request_frame {
         $frame->setMsgID($self->param('msgID'));
     }
 
+    if ($cmd eq 'Transfer::Domain') {
+        $frame->setOp('req');
+    }
+
     if($object eq 'contact') {
 
         my $addr = {
