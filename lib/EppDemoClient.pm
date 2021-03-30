@@ -435,7 +435,7 @@ sub get_request_frame {
     }
 
     if ($cmd eq 'Transfer::Domain') {
-        $frame->setOp('req');
+        $frame->setOp('request');
     }
 
     if($object eq 'contact') {
