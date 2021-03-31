@@ -17,6 +17,7 @@ use Net::EPP::Frame::Command::Info::Host;
 use Net::EPP::Frame::Command::Renew::Domain;
 use Net::EPP::Frame::Command::Update::Domain;
 use Net::EPP::Frame::Command::Update::Host;
+use Net::EPP::Frame::Command::Transfer::Domain;
 use Net::EPP::Frame::Command::Poll::Ack;
 use Net::EPP::Frame::Command::Poll::Req;
 use Net::EPP::Frame::Command::Withdraw::Domain;
@@ -431,6 +432,10 @@ sub get_request_frame {
 
     if( $cmd eq 'Poll::Ack') {
         $frame->setMsgID($self->param('msgID'));
+    }
+
+    if ($cmd eq 'Transfer::Domain') {
+        $frame->setOp('request');
     }
 
     if($object eq 'contact') {
@@ -950,7 +955,7 @@ sub commands_from_object {
     if ($object eq 'host') {
         @values = ['check', 'create', 'delete', 'info', 'update'];
     } elsif ($object eq 'domain') {
-        @values = ['check', 'create', 'delete', 'info', 'renew', 'update', 'withdraw'];
+        @values = ['check', 'create', 'delete', 'info', 'renew', 'transfer', 'update', 'withdraw'];
     } elsif ($object eq 'contact') {
         @values = ['check', 'create', 'info', 'update'];
     } elsif ($object eq 'poll') {

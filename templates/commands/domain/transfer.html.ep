@@ -1,0 +1,14 @@
+<%= include 'includes/input_domain' %>
+
+<div id="authinfo">
+    <div class="form-group form-inline">
+        <label class="col-sm-3 control-label">Authinfo Token</label>
+        <div class="col-sm-9">
+            <select name="authinfo_type" class="form-control" id="authinfo_type">
+                <option value="none"></option>
+                <option value="use">Use ==&gt;</option>
+            </select>
+            <input type="text" class="form-control" placeholder="Authinfo token" name="authinfo_pw" value="<%= session('authinfo_pw') %>">
+        </div>
+    </div>
+</div>

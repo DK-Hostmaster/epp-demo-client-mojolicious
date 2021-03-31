@@ -1,13 +1,11 @@
 package Net::EPP::Frame::Command::Withdraw::Domain;
 
-# $Id$
-# $HeadURL$
 use strict;
 use warnings;
 use base qw(Net::EPP::Frame::Command);
 
-sub commandNamespace { return ( 'urn:dkhm:params:xml:ns:dkhm-4.2' ); }
-sub withdrawNamespace { return ( 'urn:dkhm:params:xml:ns:dkhm-domain-4.2', 'domain' ); }
+sub commandNamespace { return ( 'urn:dkhm:params:xml:ns:dkhm-4.3' ); }
+sub withdrawNamespace { return ( 'urn:dkhm:params:xml:ns:dkhm-domain-4.3', 'domain' ); }
 
 sub new {
 	my ($package, $type) = @_;
@@ -18,8 +16,6 @@ sub new {
     $command->setNamespace( commandNamespace );
     $command->unbindNode;
     $extelm->addChild($command);
-    #$self->getNode('transfer');
-    #->setNodeName('withdraw');
     return $self;
 }
 
