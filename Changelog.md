@@ -1,5 +1,9 @@
 # Changelog for EPP Demo Client
 
+## 1.7.0 2021-03-31 Feature release, Update not required
+
+- Added support for domain transfer
+
 ## 1.6.0 2021-03-24 Feature release, Update not required
 
 - Added entries for DKHM XSD version 4.3 in XSD drop-down
