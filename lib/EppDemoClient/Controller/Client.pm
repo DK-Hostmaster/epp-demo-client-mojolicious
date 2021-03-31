@@ -133,7 +133,7 @@ sub _perform_login {
         );
 
     } catch ($err) {
-        $self->app->log->error(sprintf('Connection to epp_client host %s port %s failed: %s', $hostname, $port, $err));
+        $self->app->log->error( sprintf 'Connection to epp_client host %s port %s failed: %s', $hostname, $port, $err );
         return { code => $FAILURE };
     }
 
@@ -163,7 +163,7 @@ sub _perform_login {
     return $login_reply;
 }
 
-sub execute {
+sub execute_command {
     my $self = shift;
 
     my $object  = $self->param('object');
