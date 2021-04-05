@@ -114,3 +114,5 @@
         <input type="text" class="form-control" placeholder="Password" name="authinfo_pw" value="<%= session('authinfo_pw') || '' %>">
     </div>
 </div>
+
+<%= include 'includes/input_management' %>

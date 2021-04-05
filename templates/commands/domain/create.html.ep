@@ -72,3 +72,5 @@
         <button class="btn btn-primary" onclick="document.forms['execute_form']['auto_renew'].value = 'false'; return false;">False</button>
     </div>
 </div>
+
+<%= include 'includes/input_management' %>

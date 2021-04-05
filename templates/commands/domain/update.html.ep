@@ -123,3 +123,4 @@
     </div>
 </div>
 
+<%= include 'includes/input_management' %>

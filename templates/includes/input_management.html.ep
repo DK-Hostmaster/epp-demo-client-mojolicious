@@ -1,0 +1,9 @@
+<div class="form-group">
+    <label class="col-sm-3 control-label">Management</label>
+    <div class="col-sm-9" id="command_select">
+        <input type="text" class="form-control" placeholder="registrar/registrant/default" name="management" value="<%= session('management') %>">
+        <button class="btn btn-primary" onclick="document.forms['execute_form']['management'].value = ''; return false;">Account Default</button>
+        <button class="btn btn-primary" onclick="document.forms['execute_form']['management'].value = 'registrar'; return false;">Registrar</button>
+        <button class="btn btn-primary" onclick="document.forms['execute_form']['management'].value = 'registrant'; return false;">Registrant</button>
+    </div>
+</div>
