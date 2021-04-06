@@ -8,6 +8,7 @@ use Mojo::Util qw(xml_escape);
 use Digest::MD5 qw(md5_hex);
 use Time::HiRes;
 use Readonly;
+use XML::Twig;
 
 Readonly::Scalar my $SUCCESS => 1000;
 Readonly::Scalar my $FAILURE => 2500;
@@ -26,12 +27,13 @@ sub index {
             try {
                 my $hello = Net::EPP::Frame::Hello->new;
 
-                $self->app->log->info(sprintf('Sending hello command [%s]', $hello->toString));
+                $self->app->log->info(sprintf('Sending hello command [%s]', toStringPretty($hello->toString)));
                 my $answer = $epp->request($hello);
-                $self->app->log->info(sprintf('Reply to hello command [%s]', $answer->toString));
+                $self->app->log->info(sprintf('Reply to hello command [%s]', toStringPretty($answer->toString)));
                 my $hello_reply = $self->parse_reply($answer);
+
                 $self->stash(logged_in => 1);
-                $self->stash(hello_reply => $answer->toString);
+                $self->stash(hello_reply => toStringPretty($answer->toString));
             } catch ($err) {
                 $self->app->log->error("Keep alive call failed: $err");
                 $self->app->expire_connection($connection_id);
@@ -57,10 +59,10 @@ sub logout {
 
             try {
                 my $logout = $self->get_logout_request;
-                $self->app->log->info('Sending logout command [' . $logout->toString . ']');
+                $self->app->log->info('Sending logout command [' . toStringPretty($logout->toString) . ']');
                 my $start = Benchmark->new;
                 my $answer = $epp->request($logout);
-                $self->app->log->info('Reply to logout command [' . $answer->toString . ']');
+                $self->app->log->info('Reply to logout command [' . toStringPretty($answer->toString) . ']');
                 my $end = Benchmark->new;
                 my $timediff = timediff($end, $start);
                 $self->stash(execute_time => timestr($timediff, 'nop'));
@@ -123,7 +125,7 @@ sub _perform_login {
         # Notice. This may fail if connection cannot be established. This returns invalid XML. TODO: FIX.
         $epp = $self->epp_client($hostname, $port);
 
-        $self->app->log->info('Sending login command [' . $login_command->toString . ']');
+        $self->app->log->info('Sending login command [' . toStringPretty($login_command->toString) . ']');
 
         my $greeting = $epp->connect(
             SSL_version         => 'TLSv12',
@@ -139,7 +141,7 @@ sub _perform_login {
 
     my $answer = $epp->request($login_command);
 
-    $self->app->log->info('Reply to login command [' . $answer->toString . ']');
+    $self->app->log->info('Reply to login command [' . toStringPretty($answer->toString) . ']');
 
     my $login_reply = $self->parse_reply($answer);
 
@@ -153,9 +155,10 @@ sub _perform_login {
 
     if($login_reply->{code} == $SUCCESS) {
         my $hello = Net::EPP::Frame::Hello->new;
-        $self->app->log->info('Sending hello command [' . $hello->toString . ']');
+        $self->app->log->info('Sending hello command [' . toStringPretty($hello->toString) . ']');
         my $answer = $epp->request($hello);
-        $self->app->log->info('Reply to hello command [' . $answer->toString . ']');
+        $self->app->log->info('Reply to hello command [' . toStringPretty($answer->toString) . ']');
+        $self->stash(hello_reply => toStringPretty($answer->toString));
         my $hello_reply = $self->parse_reply($answer);
         $self->stash(hello_reply => $answer->toString);
     }
@@ -185,12 +188,13 @@ sub execute_command {
         if ($epp) {
             try {
                 my $hello = Net::EPP::Frame::Hello->new;
-                $self->app->log->info('Sending hello command [' . $hello->toString . ']');
+                $self->app->log->info('Sending hello command [' . toStringPretty($hello->toString) . ']');
                 my $answer = $epp->request($hello);
-                $self->app->log->info('Reply to hello command [' . $answer->toString . ']');
+                $self->app->log->info('Reply to hello command [' . toStringPretty($answer->toString) . ']');
                 my $hello_reply = $self->parse_reply($answer);
+
                 $self->stash(logged_in => 1);
-                $self->stash(hello_reply => $answer->toString);
+                $self->stash(hello_reply => toStringPretty($answer->toString));
                 $login_ok = 1;
             } catch ($err) {
                 $self->app->log->error("Keep alive call failed: $err");
@@ -222,9 +226,9 @@ sub execute_command {
         my $frame = $self->get_request_frame;
 
         my $start = Benchmark->new;
-        $self->app->log->info('Sending command [' . $frame->toString . ']');
+        $self->app->log->info('Sending command [' . toStringPretty($frame->toString) . ']');
         my $answer = $epp->request($frame);
-        $self->app->log->info('Reply to command [' . $answer->toString . ']');
+        $self->app->log->info('Reply to command [' . toStringPretty($answer->toString) . ']');
         my $end = Benchmark->new;
         my $timediff = timediff($end, $start);
         $self->stash(execute_time => timestr($timediff, 'nop'));
@@ -250,6 +254,18 @@ sub execute_command {
     $self->stash(available_hosts => $self->config->{available_hosts});
 
     $self->render(template => 'client/index');
+}
+
+sub toStringPretty {
+    my $xml = shift;
+
+    # Cleaning double spaces
+    $xml =~ s/\N{U+0020}{2,}//gd;
+
+    my $t= XML::Twig->new( pretty_print => 'record');
+    $t->parse($xml);
+
+    return $t->sprint;
 }
 
 1;
