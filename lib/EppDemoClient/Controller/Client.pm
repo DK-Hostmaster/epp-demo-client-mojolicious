@@ -244,6 +244,9 @@ sub execute {
 sub toStringPretty {
     my $xml = shift;
 
+    # Cleaning double spaces
+    $xml =~ s/\N{U+0020}{2,}//gd;
+
     my $t= XML::Twig->new( pretty_print => 'record');
     $t->parse($xml);
 
