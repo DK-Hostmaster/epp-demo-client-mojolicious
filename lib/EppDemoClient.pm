@@ -27,6 +27,7 @@ use Time::HiRes;
 use Digest::MD5 qw(md5_hex);
 use XML::Twig;
 use Syntax::Keyword::Try;
+use English qw( -no_match_vars ) ;
 
 # This method will run once at server start
 sub startup {
@@ -43,19 +44,19 @@ sub startup {
     $self->plugin(AssetPack => {pipes => [qw(Css JavaScript Combine)]});
 
     $self->asset->process(
-        "app.css" => (
-            "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.css",
-            "https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css",
-            "prism.css",
+        'app.css' => (
+            'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.css',
+            'https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css',
+            'prism.css',
         )
     );
 
     $self->asset->process(
-        "app.js" => (
-            "https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js",
-            "https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js",
-            "prism.js",
-            "app.js",
+        'app.js' => (
+            'https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.js',
+            'https://netdna.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js',
+            'prism.js',
+            'app.js',
         )
     );
 
@@ -81,7 +82,7 @@ sub startup {
     $r->get('/login')->to('client#index');
     $r->get('/logout')->to('client#logout');
     $r->post('/login')->to('client#login');
-    $r->post('/execute')->to('client#execute');
+    $r->post('/execute')->to('client#execute_command');
     $r->get('/execute' => sub{ shift()->redirect_to('/') });
 
     # Ajax requests
@@ -113,7 +114,7 @@ sub _xml_tag {
 sub _elements {
     my($self, $xml, $tag_name) = @_;
     if ( ! $xml ) { return; }
-    my @elements = map { ref($_) eq "ARRAY" ? ( @$_ ) : $_ } $xml->getElementsByTagName($tag_name);
+    my @elements = map { ref($_) eq 'ARRAY' ? ( @$_ ) : $_ } $xml->getElementsByTagName($tag_name);
     return @elements;
 }
 
@@ -128,7 +129,7 @@ sub _text_element_into {
     my(@texts) = $self->text_elements( $xml, $tag_name );
     if ( ! @texts ) { return; }
 
-    my $number = "";
+    my $number = q{};
 
     foreach my $text ( @texts ) {
 
@@ -140,7 +141,7 @@ sub _text_element_into {
 }
 
 sub _extension_element {
-    my($self, $xml_frame) = @_;
+    my ($self, $xml_frame) = @_;
 
     my $extension_element = $xml_frame->getNode('extension');
     if ( ! $extension_element ) {
@@ -152,11 +153,11 @@ sub _extension_element {
 }
 
 sub _add_extension_element {
-    my($self, $xml_frame, $element_name, $value, $extension_element) = @_;
+    my ($self, $xml_frame, $element_name, $value, $extension_element) = @_;
 
     $extension_element //= $self->extension_element($xml_frame);
 
-    if($value) {
+    if ($value) {
         my $element = $xml_frame->createElement($element_name);
         $element->setNamespace( $self->namespace('dkhm') );
         $element->appendText($value);
@@ -165,7 +166,7 @@ sub _add_extension_element {
 }
 
 sub _add_ds_extension_element {
-    my($frame, $op, $urgent) = @_;
+    my ($frame, $op, $urgent) = @_;
 
     my $extension = $frame->getNode('extension');
     if ( ! $extension ) {
@@ -201,6 +202,8 @@ my %connections;
 sub add_connection {
     my ($self, $id, $connection) = @_;
     $connections{$id} = $connection;
+
+    return 1;
 }
 
 sub get_connection {
@@ -218,10 +221,12 @@ sub expire_connection {
         }
         delete $connections{$id};
     }
+
+    return 1;
 }
 
 sub set_if_can {
-    my($self, $frame, $func, @args) = @_;
+    my ($self, $frame, $func, @args) = @_;
     return unless @args;
     return unless UNIVERSAL::can($frame, $func);
     $frame->$func(@args);
@@ -236,10 +241,10 @@ sub get_login_request {
     $login->pw->appendText($password);
     $login->lang->appendText(    'en'  );
     $login->version->appendText( '1.0' );
-    $login->clTRID->appendText( md5_hex(Time::HiRes::time().$$) ); # set the client transaction ID:
+    $login->clTRID->appendText( md5_hex(Time::HiRes::time().$PROCESS_ID) ); # set the client transaction ID:
 
     foreach my $v (qw(domain host contact)){
-        my($type, $xmlns, $schemaLocation) = Net::EPP::Frame::ObjectSpec->spec($v);
+        my ($type, $xmlns, $schemalocation) = Net::EPP::Frame::ObjectSpec->spec($v);
         my $obj = $login->createElement('objURI');
         $obj->appendText($xmlns);
         $login->svcs->appendChild($obj);
@@ -249,7 +254,7 @@ sub get_login_request {
     foreach my $xmlns_name (qw(xmlns.secDNS xmlns.dkhm)){
         my $xmlns = $self->param($xmlns_name);
         if ( @{ $self->every_param($xmlns_name) } ) {
-            $self->app->log->info(sprintf('Set session %s => %s', $xmlns_name, $xmlns//"<undef>"));
+            $self->app->log->info( sprintf 'Set session %s => %s', $xmlns_name, $xmlns//'<undef>' );
             $self->session($xmlns_name => $xmlns);
             next unless $xmlns;
         }
@@ -272,10 +277,10 @@ sub get_request_frame {
     my $command = $self->param('command');  # f.ex. create/update
     my $object  = $self->param('object');   # f.ex. host/domain/poll
 
-    my $cmd = ucfirst($command) . '::' . ucfirst($object);
+    my $cmd = ucfirst $command . '::' . ucfirst $object;
     # For poll the object and command order is reversed
     if ( $object eq 'poll' ) {
-        $cmd = ucfirst($object) . '::' . ucfirst($command);
+        $cmd = ucfirst $object . '::' . ucfirst $command;
     }
 
     my $frame_name = 'Net::EPP::Frame::Command::' . $cmd;
@@ -303,7 +308,7 @@ sub get_request_frame {
     if( $domain_create_el ) {
         my $nameserver_names     = $self->every_param('new_nameserver_name');
         my $nameserver_el = $frame->createElement('domain:ns');
-        foreach my $nameserver_name ( @$nameserver_names ) {
+        foreach my $nameserver_name ( @{$nameserver_names} ) {
             next unless $nameserver_name;
             my $el = $frame->createElement('domain:hostObj');
             $el->appendText($nameserver_name);
@@ -320,9 +325,9 @@ sub get_request_frame {
 
         my $contact_types      = $self->every_param('new_contact_type');
         my $contact_userids    = $self->every_param('new_contact_userid');
-        while ( @$contact_types ) {
-            my $contact_type      = shift @$contact_types;
-            my $contact_userid    = shift @$contact_userids;
+        while ( @{$contact_types} ) {
+            my $contact_type      = shift @{$contact_types};
+            my $contact_userid    = shift @{$contact_userids};
             next unless $contact_type || $contact_userid;
 
             my $el = $frame->createElement('domain:contact');
@@ -584,7 +589,7 @@ sub get_request_frame {
     if ( $remove_all ) {
         my $op_element   = _add_ds_extension_element($frame, 'rem', 1);
         my $data_element = $frame->createElement('secDNS:all');
-        $data_element->appendText( "true" );
+        $data_element->appendText( 'true' );
         $op_element->appendChild($data_element);
     }
 
@@ -642,42 +647,42 @@ sub get_request_frame {
         my $nameserver_names     = $self->every_param($op.'_nameserver_name');
         my $nameserver_addrs     = $self->every_param($op.'_nameserver_addr');
         my @ns_data;
-        while ( @$nameserver_names ) {
-            my $nameserver_name     = shift @$nameserver_names;
-            my $nameserver_addrs    = shift @$nameserver_addrs;
-            next unless $nameserver_name;
-            my @addrs = map { { addr => $_, version => (/^\d+\.\d+\.\d+\.\d+$/ ? 'v4' : 'v6') } } split /[^a-z0-9:.]+/, $nameserver_addrs;
+        while ( @{$nameserver_names} ) {
+            my $ns_name     = shift @{$nameserver_names};
+            my $ns_addrs    = shift @{$nameserver_addrs};
+            next unless $ns_name;
+            my @addrs = map { { addr => $_, version => (/^\d+\.\d+\.\d+\.\d+$/ ? 'v4' : 'v6') } } split /[^a-z0-9:.]+/, $ns_addrs;
 
-            push @ns_data, @addrs ? { name => $nameserver_name, addrs => \@addrs } : $nameserver_name;
+            push @ns_data, @addrs ? { name => $ns_name, addrs => \@addrs } : $ns_name;
         }
         if ( @ns_data ) {
             ## use Data::Dumper; warn "=== NAMESERVER $op $nameserver_name $nameserver_addrs ==> ".Dumper(\@ns_data)." ===\n";
             # Use $frame->addNS() or $frame->remNS() to insert into frame.
-            my $call = $op."NS";
+            my $call = $op.'NS';
             $frame->$call( @ns_data );
         }
 
         my $contact_types      = $self->every_param($op.'_contact_type');
         my $contact_userids    = $self->every_param($op.'_contact_userid');
-        while ( @$contact_types ) {
-            my $contact_type      = shift @$contact_types;
-            my $contact_userid    = shift @$contact_userids;
+        while ( @{$contact_types} ) {
+            my $contact_type      = shift @{$contact_types};
+            my $contact_userid    = shift @{$contact_userids};
             next unless $contact_type || $contact_userid;
 
             # Use $frame->addContact() or $frame->remContact() to insert into frame.
-            my $call = $op."Contact";
+            my $call = $op.'Contact';
             $frame->$call( $contact_type, $contact_userid );
         }
 
         my $status_types      = $self->every_param($op.'_status_type');
         my $status_infos      = $self->every_param($op.'_status_info');
-        while ( @$status_types ) {
-            my $status_type      = shift @$status_types;
-            my $status_info      = shift @$status_infos;
+        while ( @{$status_types} ) {
+            my $status_type      = shift @{$status_types};
+            my $status_info      = shift @{$status_infos};
             next unless $status_type || $status_info;
 
             # Use $frame->addStatus() or $frame->remStatus() to insert into frame. remStatus() does not use $status_info
-            my $call = $op."Status";
+            my $call = $op.'Status';
             $frame->$call( $status_type, $status_info );
         }
 
@@ -688,7 +693,7 @@ sub get_request_frame {
     if ( defined $authinfo_type ) {
         my %map = (
             generate => 'auto',
-            clear    => '',
+            clear    => q{},
             # Perhaps add alternative clear option where authInfoChgType element <domain:null/> is passed instead of <domain:pw/>
             use      => $authinfo_pw,
         );
@@ -723,7 +728,7 @@ sub get_request_frame {
     $frame->getNode('command')->removeChild($oldid);
 
     my $transactionid = $frame->createElement('clTRID');
-    $transactionid->appendText( md5_hex(Time::HiRes::time().$$) );
+    $transactionid->appendText( md5_hex(Time::HiRes::time().$PROCESS_ID) );
     $frame->getNode('command')->appendChild($transactionid);
 
     $self->app->log->info("Frame is $frame_name : $frame");
@@ -734,7 +739,7 @@ sub get_request_frame {
 sub get_logout_request {
     my ($self) = @_;
     my $logout = Net::EPP::Frame::Command::Logout->new;
-    $logout->clTRID->appendText( md5_hex(Time::HiRes::time().$$) );
+    $logout->clTRID->appendText( md5_hex(Time::HiRes::time().$PROCESS_ID) );
     return $logout;
 }
 
@@ -747,7 +752,7 @@ sub epp_client {
         ssl        => 1,
         dom        => undef,
         frames     => 1,
-    ) or die "failed to connec to epp server $hostname:$port $@";
+    ) or die "failed to connect to epp server $hostname:$port $@";
 
     return $epp;
 
@@ -804,23 +809,23 @@ sub parse_reply {
     }
 
     my $host_element = ($epp_frame->getElementsByTagName('host:infData'));
-    if($host_element) {
+    if ($host_element) {
         my $info = ( $reply->{host_data} //= {} );
 
         $self->text_element_into( $epp_frame, 'host:name',   $info, 'name'   );
         $self->text_element_into( $epp_frame, 'host:roid',   $info, 'roid' );
 
-        my $status = "status";
+        my $status = 'status';
         foreach my $ele ( $self->elements( $epp_frame, 'host:status' ) ) {
-            my $s = $ele->{"s"};
+            my $s = $ele->{'s'};
             $info->{ $status } = $s;
-            $status .= " ";  # A new key, but space is not visible
+            $status .= q{ };  # A new key, but space is not visible
         }
 
-        my $addr = "addr";
+        my $addr = 'addr';
         foreach my $ele ( $self->elements( $epp_frame, 'host:addr' ) ) {
             $info->{ $addr } = $ele->textContent . " (". $ele->{"ip"} . ")";
-            $addr .= " ";  # A new key, but space is not visible
+            $addr .= q{ };  # A new key, but space is not visible
         }
 
         $self->text_element_into( $epp_frame, 'host:clID',     $info, 'clID' );
@@ -829,25 +834,25 @@ sub parse_reply {
 
     }
 
-    my($domain_element) = $self->elements( $epp_frame, 'domain:infData');
-    if($domain_element) {
+    my ($domain_element) = $self->elements( $epp_frame, 'domain:infData');
+    if ($domain_element) {
         my $info = ( $reply->{domain_data} //= {} );
 
         $self->text_element_into( $epp_frame, 'domain:name',   $info, 'name'   );
         $self->text_element_into( $epp_frame, 'domain:roid',   $info, 'roid' );
 
         #  <domain:status s="serverDeleteProhibited"/>
-        my $status = "status";
+        my $status = 'status';
         foreach my $ele ( $self->elements( $epp_frame, 'domain:status' ) ) {
-            my $s = $ele->{"s"};
+            my $s = $ele->{'s'};
             $info->{ $status } = $s;
-            $status .= " "; # A new key, but space is not visible
+            $status .= q{ }; # A new key, but space is not visible
         }
 
         $self->text_element_into( $epp_frame, 'domain:registrant', $info, 'registrant' );
 
         foreach my $ele ( $self->elements( $epp_frame, 'domain:contact' ) ) {
-            my $type = $ele->getAttribute("type");
+            my $type = $ele->getAttribute('type');
             my $userid = $ele->textContent;
             $info->{ $type } = $userid;
         }
@@ -861,8 +866,8 @@ sub parse_reply {
 
     }
 
-    my($contact_element) = $self->elements( $epp_frame, 'contact:infData');
-    if($contact_element) {
+    my ($contact_element) = $self->elements( $epp_frame, 'contact:infData');
+    if ($contact_element) {
         my $info = ( $reply->{contact_data} //= {} );
 
         $self->text_element_into( $epp_frame, 'contact:id',     $info, 'id'   );
@@ -881,23 +886,23 @@ sub parse_reply {
         $self->text_element_into( $epp_frame, 'contact:crDate', $info, 'crDate' );
 
         #  <contact:status s="serverDeleteProhibited"/>
-        my $status = "status";
+        my $status = 'status';
         foreach my $ele ( $self->elements( $epp_frame, 'contact:status' ) ) {
-            my $s = $ele->{"s"};
+            my $s = $ele->{'s'};
             $info->{ $status } = $s;
-            $status .= " ";
+            $status .= q{ };
         }
     }
 
     my $contact_created_element = ($epp_frame->getElementsByTagName('contact:creData'))[0];
-    if($contact_created_element) {
+    if ($contact_created_element) {
         my $info = ( $reply->{contact_data} //= {} );
         $self->text_element_into( $epp_frame, 'contact:id',     $info, 'id' );
         $self->text_element_into( $epp_frame, 'contact:crDate', $info, 'crDate' );
     }
 
     my $domain_created_element = ($epp_frame->getElementsByTagName('domain:creData'))[0];
-    if($domain_created_element) {
+    if ($domain_created_element) {
         my $info = ( $reply->{domain_data} //= {} );
         $self->text_element_into( $epp_frame, 'domain:name',   $info, 'name' );
         $self->text_element_into( $epp_frame, 'domain:crDate', $info, 'crDate' );
@@ -905,25 +910,25 @@ sub parse_reply {
     }
 
     my $host_created_element = ($epp_frame->getElementsByTagName('host:creData'))[0];
-    if($host_created_element) {
+    if ($host_created_element) {
         my $info = ( $reply->{host_data} //= {} );
         $self->text_element_into( $epp_frame, 'host:name',   $info, 'name' );
         $self->text_element_into( $epp_frame, 'host:crDate', $info, 'crDate' );
     }
 
     my $msgq_element = ($epp_frame->getElementsByTagName('msgQ'))[0];
-    if($msgq_element) {
+    if ($msgq_element) {
         my $info = ( $reply->{msgQ} //= {} );
-        $info->{count} = $msgq_element->getAttribute("count");
-        $info->{id}    = $msgq_element->getAttribute("id");
+        $info->{count} = $msgq_element->getAttribute('count');
+        $info->{id}    = $msgq_element->getAttribute('id');
         my $message_element = ($msgq_element->getElementsByTagName('msg'))[0];
-        if($message_element) {
+        if ($message_element) {
             $info->{msg} = $message_element->textContent;
         }
     }
 
     my $extension_element = ($epp_frame->getElementsByTagName('extension'))[0];
-    if($extension_element) {
+    if ($extension_element) {
         my $info = ( $reply->{extension} //= {} );
         $self->text_element_into( $epp_frame, 'dkhm:mobilephone', $info, 'dkhm:mobilephone' );
         $self->text_element_into( $epp_frame, 'dkhm:secondaryEmail', $info, 'dkhm:secondaryEmail' );
@@ -933,14 +938,14 @@ sub parse_reply {
         $self->text_element_into( $epp_frame, 'dkhm:risk_assessment', $info, 'dkhm:risk_assessment' );
 
         foreach my $ele ( $self->elements( $epp_frame, 'dkhm:domainAdvisory' ) ) {
-            my $advisory = $ele->getAttribute("advisory");
-            my $domain   = $ele->getAttribute("domain");
-            my $date     = $ele->getAttribute("date");
+            my $advisory = $ele->getAttribute('advisory');
+            my $domain   = $ele->getAttribute('domain');
+            my $date     = $ele->getAttribute('date');
             $info->{ "Advisory: $advisory" } = join ' / ', $domain, $date//();
         }
     }
 
-    my($svc_menu) = $self->elements( $epp_frame, 'svcMenu');
+    my ($svc_menu) = $self->elements( $epp_frame, 'svcMenu');
     if ( $svc_menu ) {
         foreach my $ele ( $self->elements( $svc_menu, 'extURI' ) ) {
             my $extURI = $ele->textContent;
@@ -949,18 +954,17 @@ sub parse_reply {
             my $nsname = "xmlns.${name}";
             my $old = $self->session($nsname);
             if ( ! $old ) {
-                $self->app->log->info(sprintf('Setting session %s to "%s"', $nsname, $extURI));
+                $self->app->log->info( sprintf 'Setting session %s to "%s"', $nsname, $extURI );
                 $self->session($nsname => $extURI);
             }
             elsif ( $old ne $extURI ) {
-                $self->app->log->info(sprintf('Session %s remains "%s" (not changing to "%s")', $nsname, $old, $extURI));
+                $self->app->log->info( sprintf 'Session %s remains "%s" (not changing to "%s")', $nsname, $old, $extURI );
             }
             else {
-                $self->app->log->info(sprintf('Session %s remains "%s"', $nsname, $old));
+                $self->app->log->info( sprintf 'Session %s remains "%s"', $nsname, $old );
             }
         }
     }
-
 
     return $reply;
 }
@@ -1005,6 +1009,8 @@ sub _generic_param_to_frame {
         # Store only last value in session. Can we handle @$values in session instead ?
         $self->session($param_name => $value);
     }
+
+    return 1;
 }
 
 1;

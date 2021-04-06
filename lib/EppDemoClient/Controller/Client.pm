@@ -7,7 +7,11 @@ use Net::EPP::Frame::Hello;
 use Mojo::Util qw(xml_escape);
 use Digest::MD5 qw(md5_hex);
 use Time::HiRes;
+use Readonly;
 use XML::Twig;
+
+Readonly::Scalar my $SUCCESS => 1000;
+Readonly::Scalar my $FAILURE => 2500;
 
 # The frontpage.
 sub index {
@@ -55,10 +59,10 @@ sub logout {
 
             try {
                 my $logout = $self->get_logout_request;
-                $self->app->log->info("Sending logout command [" . toStringPretty($logout->toString) . "]");
+                $self->app->log->info('Sending logout command [' . toStringPretty($logout->toString) . ']');
                 my $start = Benchmark->new;
                 my $answer = $epp->request($logout);
-                $self->app->log->info("Reply to logout command [" . toStringPretty($answer->toString) . "]");
+                $self->app->log->info('Reply to logout command [' . toStringPretty($answer->toString) . ']');
                 my $end = Benchmark->new;
                 my $timediff = timediff($end, $start);
                 $self->stash(execute_time => timestr($timediff, 'nop'));
@@ -121,7 +125,7 @@ sub _perform_login {
         # Notice. This may fail if connection cannot be established. This returns invalid XML. TODO: FIX.
         $epp = $self->epp_client($hostname, $port);
 
-        $self->app->log->info("Sending login command [" . toStringPretty($login_command->toString) . "]");
+        $self->app->log->info('Sending login command [' . toStringPretty($login_command->toString) . ']');
 
         my $greeting = $epp->connect(
             SSL_version         => 'TLSv12',
@@ -131,29 +135,29 @@ sub _perform_login {
         );
 
     } catch ($err) {
-        $self->app->log->error(sprintf('Connection to epp_client host %s port %s failed: %s', $hostname, $port, $err));
-        return { code => 2500 };
+        $self->app->log->error( sprintf 'Connection to epp_client host %s port %s failed: %s', $hostname, $port, $err );
+        return { code => $FAILURE };
     }
 
     my $answer = $epp->request($login_command);
 
-    $self->app->log->info("Reply to login command [" . toStringPretty($answer->toString) . "]");
+    $self->app->log->info('Reply to login command [' . toStringPretty($answer->toString) . ']');
 
     my $login_reply = $self->parse_reply($answer);
 
-    if($login_reply->{code} == 1000) {
-        $self->app->log->info("Login was successful, store username and password in session");
+    if($login_reply->{code} == $SUCCESS) {
+        $self->app->log->info('Login was successful, store username and password in session');
         $self->stash(logged_in => 1);
         $self->app->add_connection($login_reply->{transaction_id}, $epp);
         $self->session(connection_id => $login_reply->{transaction_id});
-        $self->app->log->info("Logged in, save connection_id " . $login_reply->{transaction_id});
+        $self->app->log->info('Logged in, save connection_id ' . $login_reply->{transaction_id});
     }
 
-    if($login_reply->{code} == 1000) {
+    if($login_reply->{code} == $SUCCESS) {
         my $hello = Net::EPP::Frame::Hello->new;
-        $self->app->log->info("Sending hello command [" . toStringPretty($hello->toString) . "]");
+        $self->app->log->info('Sending hello command [' . toStringPretty($hello->toString) . ']');
         my $answer = $epp->request($hello);
-        $self->app->log->info("Reply to hello command [" . toStringPretty($answer->toString) . "]");
+        $self->app->log->info('Reply to hello command [' . toStringPretty($answer->toString) . ']');
         $self->stash(hello_reply => toStringPretty($answer->toString));
         my $hello_reply = $self->parse_reply($answer);
         $self->stash(hello_reply => $answer->toString);
@@ -162,7 +166,7 @@ sub _perform_login {
     return $login_reply;
 }
 
-sub execute {
+sub execute_command {
     my $self = shift;
 
     my $object  = $self->param('object');
@@ -184,9 +188,9 @@ sub execute {
         if ($epp) {
             try {
                 my $hello = Net::EPP::Frame::Hello->new;
-                $self->app->log->info("Sending hello command [" . toStringPretty($hello->toString) . "]");
+                $self->app->log->info('Sending hello command [' . toStringPretty($hello->toString) . ']');
                 my $answer = $epp->request($hello);
-                $self->app->log->info("Reply to hello command [" . toStringPretty($answer->toString) . "]");
+                $self->app->log->info('Reply to hello command [' . toStringPretty($answer->toString) . ']');
                 my $hello_reply = $self->parse_reply($answer);
 
                 $self->stash(logged_in => 1);
@@ -204,7 +208,7 @@ sub execute {
             $self->app->log->info("Try to login again at $hostname:$port with $username");
             if ($hostname && $username) {
                 my $login_reply = $self->_perform_login($hostname, $port, $username, $password);
-                if($login_reply->{code} == 1000) {
+                if($login_reply->{code} == $SUCCESS) {
                     $connection_id = $login_reply->{transaction_id};
                     $epp = $self->app->get_connection($connection_id);
                     $login_ok = 1;
@@ -222,9 +226,9 @@ sub execute {
         my $frame = $self->get_request_frame;
 
         my $start = Benchmark->new;
-        $self->app->log->info("Sending command [" . toStringPretty($frame->toString) . "]");
+        $self->app->log->info('Sending command [' . toStringPretty($frame->toString) . ']');
         my $answer = $epp->request($frame);
-        $self->app->log->info("Reply to command [" . toStringPretty($answer->toString) . "]");
+        $self->app->log->info('Reply to command [' . toStringPretty($answer->toString) . ']');
         my $end = Benchmark->new;
         my $timediff = timediff($end, $start);
         $self->stash(execute_time => timestr($timediff, 'nop'));
@@ -233,14 +237,14 @@ sub execute {
         $self->stash(command_reply => $command_reply);
 
         # command failed, server closing connection
-        if($command_reply->{code} == 2500) {
+        if($command_reply->{code} == $FAILURE) {
             $self->app->expire_connection($connection_id);
             delete $self->session->{connection_id};
             $self->stash(logged_in => 0);
         }
 
     } else {
-        $self->app->log->info("Found no connection_id in session");
+        $self->app->log->info('Found no connection_id in session');
     }
 
     $self->session(object => $object);
