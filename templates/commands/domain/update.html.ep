@@ -7,6 +7,21 @@
     </div>
 </div>
 
+<div id="authinfo">
+    <div class="form-group form-inline">
+        <label class="col-sm-3 control-label">Authinfo Token</label>
+        <div class="col-sm-9">
+            <select name="authinfo_type" class="form-control" id="authinfo_type">
+                <option value="none"></option>
+                <option value="generate">Generate</option>
+                <option value="clear">Clear</option>
+                <option value="use">Use ==&gt;</option>
+            </select>
+            <input type="text" class="form-control" placeholder="Authinfo token" name="authinfo_pw" value="<%= session('authinfo_pw') %>">
+        </div>
+    </div>
+</div>
+
 <div id="rem_nameservers">
     <div class="form-group form-inline rem_nameserver">
         <label class="col-sm-3 control-label">Remove nameserver</label>
@@ -47,6 +62,15 @@
             <input type="text" class="form-control" placeholder="Status type" name="add_status_type">
             <input type="text" class="form-control" placeholder="Status info" name="add_status_info">
             <button class="btn btn-primary" onclick="return add_addr_field('add_status', 'add_statuss');">Add</button>
+        </div>
+    </div>
+</div>
+
+<div id="rem_all_dsrecords">
+    <div class="form-group form-inline rem_all_dsrecords">
+        <label class="col-sm-3 control-label">Remove all DS records</label>
+        <div class="col-sm-9">
+            <input type="checkbox" class="form-control" name="rem_all_dsrecords" value="1">
         </div>
     </div>
 </div>
@@ -98,3 +122,4 @@
         </div>
     </div>
 </div>
+

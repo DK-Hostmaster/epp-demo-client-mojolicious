@@ -26,7 +26,7 @@ DK Hostmaster EPP service demo/test client
 <a name="version"></a>
 # VERSION
 
-This documentation describes version 1.1.0
+This documentation describes version 1.6.0
 
 <a name="usage"></a>
 # USAGE
@@ -44,12 +44,11 @@ The application can be used using `docker`
 
     $ docker build -t epp-demo-client .
 
-    $ docker run --rm -p 3000:3000 epp-demo-client
+    $ docker run --rm -p 3000:3000 --name epp-demo-client epp-demo-client
 
 Open your browser at:
 
     https://localhost:3000/
-
 
 <a name="about"></a>
 # ABOUT
@@ -108,7 +107,7 @@ The main site for this client is the Github repository.
 <a name="copyright"></a>
 # COPYRIGHT
 
-This software is under copyright by DK Hostmaster A/S 2016
+This software is under copyright by DK Hostmaster A/S 2016-2019
 
 <a name="license"></a>
 # LICENSE

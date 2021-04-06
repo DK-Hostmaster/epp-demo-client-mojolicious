@@ -19,3 +19,5 @@ nytprof.out
 *.o
 *.bs
 /_eumm/
+.vstags
+prototypes

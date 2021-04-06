@@ -38,20 +38,25 @@ function get_command_form(command) {
     });
 }
 
+function date_to_text( from, to ) {
+    if ( from.val() ) {
+        to.val( from.val() + "T00:00:00.0Z" );
+    } else {
+        to.val( "" );
+    }
+}
+
 $(document).ready(function(){
 
     $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
         if(e.target.hash === '#login_xml') {
 
-            var postForm = {
-                'username' : $('input[name=username]').val(),
-                'password' : $('input[name=password]').val(),
-            };
+            var formData = $('#login_form_data').serialize();
 
             $.ajax({
                 type      : 'POST',
                 url       : 'get_login_xml',
-                data      : postForm,
+                data      : formData,
                 success   : function(data) {
                     var login_xml_pre = $('#login_xml_code');
                     login_xml_pre.html(data);

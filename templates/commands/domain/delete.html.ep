@@ -1,0 +1,10 @@
+<%= include 'includes/input_domain' %>
+
+<div class="form-group">
+    <label for="inputdelDate" class="col-sm-3 control-label">Delete date</label>
+    <div class="col-sm-9">
+        <input type="text" class="form-control" id="inputdelDate" value="<%= session 'delDate' %>" name="delDate">
+        <input type="date" onchange="javascript: date_to_text($(this), $('#inputdelDate'))">
+        <p class="help-block">Datetime format (for text input): "yyyy-mm-ddThh:mm:ss.0Z" (f.ex. "2020-12-24T00:00:00.0Z")<br/>Notice that delete processing currently happens only at midnight (CET).</p>
+    </div>
+</div>

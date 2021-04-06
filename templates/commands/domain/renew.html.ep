@@ -12,7 +12,7 @@
     <label for="inputPeriod" class="col-sm-3 control-label">Period</label>
     <div class="col-sm-9">
         <input type="text" class="form-control" id="inputPeriod" value="<%= session 'period' %>" name="period">
-        <p class="help-block">1,2,3 or 5.</p>
+        <p class="help-block">1-10.</p>
     </div>
 </div>
 

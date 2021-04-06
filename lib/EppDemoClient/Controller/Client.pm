@@ -2,11 +2,8 @@ package EppDemoClient::Controller::Client;
 use Mojo::Base 'Mojolicious::Controller';
 
 use Benchmark;
-
-use TryCatch;
-
+use Syntax::Keyword::Try;
 use Net::EPP::Frame::Hello;
-
 use Mojo::Util qw(xml_escape);
 use Digest::MD5 qw(md5_hex);
 use Time::HiRes;
@@ -26,9 +23,11 @@ sub index {
             try {
                 my $hello = Net::EPP::Frame::Hello->new;
 
-                $self->app->log->info("Sending hello command [" . toStringPretty($hello->toString) . "]");
+                $self->app->log->info(sprintf('Sending hello command [%s]', toStringPretty($hello->toString)));
                 my $answer = $epp->request($hello);
-                $self->app->log->info("Reply to hello command [" . toStringPretty($answer->toString) . "]");
+                $self->app->log->info(sprintf('Reply to hello command [%s]', toStringPretty($answer->toString)));
+                my $hello_reply = $self->parse_reply($answer);
+
                 $self->stash(logged_in => 1);
                 $self->stash(hello_reply => toStringPretty($answer->toString));
             } catch ($err) {
@@ -67,7 +66,8 @@ sub logout {
                 $self->stash(command_reply => $self->parse_reply($answer));
 
             } catch ($err) {
-                $self->app->log->warn("Failed to send logout command: $err");
+                # Croak traceback may appear at end of $err - We do not need that in output.
+                $self->app->log->warn( sprintf('Failed to send logout command: %s', $err =~ s/\n.*\z//s) );
             }
         }
         $self->app->expire_connection($connection_id);
@@ -115,18 +115,25 @@ sub _perform_login {
 
     my $login_command = $self->get_login_request($username, $password);
 
-    $self->app->log->info("Connecting to $hostname:$port");
+    my $epp;
+    try {
+        $self->app->log->info("Connecting to $hostname:$port");
+        # Notice. This may fail if connection cannot be established. This returns invalid XML. TODO: FIX.
+        $epp = $self->epp_client($hostname, $port);
 
-    my $epp = $self->epp_client($hostname, $port);
+        $self->app->log->info("Sending login command [" . toStringPretty($login_command->toString) . "]");
 
-    my $greeting = $epp->connect(
-        SSL_version         => 'TLSv12',
-        SSL_verify_mode     => 0,    # 0 = disable SSL verify,  3 = 1+2
-        SSL_use_cert        => 1,
-        SSL_verifycn_name   => $hostname,
-    );
+        my $greeting = $epp->connect(
+            SSL_version         => 'TLSv12',
+            SSL_verify_mode     => 0,    # 0 = disable SSL verify,  3 = 1+2
+            SSL_use_cert        => 1,
+            SSL_verifycn_name   => $hostname,
+        );
 
-    $self->app->log->info("Sending login command [" . toStringPretty($login_command->toString) . "]");
+    } catch ($err) {
+        $self->app->log->error(sprintf('Connection to epp_client host %s port %s failed: %s', $hostname, $port, $err));
+        return { code => 2500 };
+    }
 
     my $answer = $epp->request($login_command);
 
@@ -148,6 +155,8 @@ sub _perform_login {
         my $answer = $epp->request($hello);
         $self->app->log->info("Reply to hello command [" . toStringPretty($answer->toString) . "]");
         $self->stash(hello_reply => toStringPretty($answer->toString));
+        my $hello_reply = $self->parse_reply($answer);
+        $self->stash(hello_reply => $answer->toString);
     }
 
     return $login_reply;
@@ -178,6 +187,8 @@ sub execute {
                 $self->app->log->info("Sending hello command [" . toStringPretty($hello->toString) . "]");
                 my $answer = $epp->request($hello);
                 $self->app->log->info("Reply to hello command [" . toStringPretty($answer->toString) . "]");
+                my $hello_reply = $self->parse_reply($answer);
+
                 $self->stash(logged_in => 1);
                 $self->stash(hello_reply => toStringPretty($answer->toString));
                 $login_ok = 1;
