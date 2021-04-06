@@ -331,7 +331,6 @@ sub get_request_frame {
             $domain_create_el->appendChild($el);
         }
 
-
         my $keytags      = $self->every_param('new_ds_keytag');
         my $algorithms   = $self->every_param('new_ds_algorithm');
         my $digest_types = $self->every_param('new_ds_digest_type');
@@ -380,11 +379,18 @@ sub get_request_frame {
             $token_el->appendText($orderconfirmationtoken);
             $extension->appendChild($token_el);
         }
+
+        if (my $management = $self->param('management')) {
+            if ($management) {
+                $self->add_extension_element($frame, 'dkhm:management', $management);
+                $self->session(management => $management);
+            }
+        }
+
         $self->session(
             registrant => $registrant,
         );
     }
-
 
     my $addrs = $self->every_param('addr');
     foreach my $addr (@${addrs}) {
@@ -473,6 +479,12 @@ sub get_request_frame {
                 $self->add_extension_element($frame, 'dkhm:pnumber', $pnumber);
             }
 
+            if (my $management = $self->param('management')) {
+                if ($management) {
+                    $self->add_extension_element($frame, 'dkhm:management', $management);
+                    $self->session(management => $management);
+                }
+            }
         }
         elsif ($command eq 'update') {
             # $frame->setContact( $self->param('contact.userid') );
@@ -559,6 +571,14 @@ sub get_request_frame {
         );
     }
 
+    if ($cmd eq 'Update::Domain') {
+        if (my $management = $self->param('management')) {
+            if ($management) {
+                $self->add_extension_element($frame, 'dkhm:management', $management);
+                $self->session(management => $management);
+            }
+        }
+    }
 
     my $remove_all   = $self->param('rem_all_dsrecords');
     if ( $remove_all ) {
@@ -595,7 +615,6 @@ sub get_request_frame {
                 $op_element = $frame->createElement("secDNS:${op}");
                 $update->appendChild($op_element);
             }
-
 
             my $data_element = $frame->createElement('secDNS:dsData');
 
@@ -649,7 +668,6 @@ sub get_request_frame {
             my $call = $op."Contact";
             $frame->$call( $contact_type, $contact_userid );
         }
-
 
         my $status_types      = $self->every_param($op.'_status_type');
         my $status_infos      = $self->every_param($op.'_status_info');
