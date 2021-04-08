@@ -13,7 +13,8 @@
         <div class="col-sm-9">
             <select name="authinfo_type" class="form-control" id="authinfo_type">
                 <option value="none"></option>
-                <option value="generate">Generate</option>
+                <option value="generate_redel">Generate for redelegation</option>
+                <option value="generate_transfer">Generate for transfer</option>
                 <option value="clear">Clear</option>
                 <option value="use">Use ==&gt;</option>
             </select>

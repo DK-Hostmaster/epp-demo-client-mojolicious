@@ -692,7 +692,8 @@ sub get_request_frame {
     my $authinfo_pw   = $self->param('authinfo_pw');
     if ( defined $authinfo_type ) {
         my %map = (
-            generate => 'auto',
+            generate_redel    => 'autoredel',
+            generate_transfer => 'autotransfer',
             clear    => q{},
             # Perhaps add alternative clear option where authInfoChgType element <domain:null/> is passed instead of <domain:pw/>
             use      => $authinfo_pw,
