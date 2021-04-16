@@ -1,5 +1,9 @@
 # Changelog for EPP Demo Client
 
+## 1.9.0 2021-04-16 Feature release, Update not required
+
+- Added new keywords for generation AuthInfo tokens
+
 ## 1.8.0 2021-03-31 Feature release, Update not required
 
 - Added support for dkhm:management extension, introduced with XSD 4.3
